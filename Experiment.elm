@@ -4,20 +4,21 @@ import Html (..)
 import Html.Attributes (..)
 
 import HtmlConstructs (..)
+import Sound
 
 -- MODELS
 
 type alias Experiment =
-    { sounds : List Int
+    { samples : List Int
     , rates : List Int
-    , currentSound : Int
+    , sound : Sound.Model
     }
 
 emptyExperiment : Experiment
 emptyExperiment =
-    { sounds = [1,2,3,4,5]
+    { samples = [1,2,3,4,5]
     , rates = []
-    , currentSound = 1
+    , sound = { soundId = 1, playSound = True }
     }
 
 type Update = NoOp
