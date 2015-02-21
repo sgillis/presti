@@ -8,8 +8,10 @@ import Time (..)
 
 import HtmlConstructs (..)
 import Screens
-import Questionnaire
 import Sound
+import Slider
+import Questionnaire
+import Instructions
 import Experiment
 
 -- MODEL
@@ -17,14 +19,14 @@ import Experiment
 type Action = NoOp
             | ScreenUpdate Screens.Update
             | QuestionnaireUpdate Questionnaire.Update
-            | DragSlider Int
+            | SliderUpdate Slider.Update
             | SoundUpdate Sound.Update
 
 type alias Model =
     { screen : Screens.Model
     , questions : Questionnaire.Questions
+    , instructions : Instructions.Instructions
     , sliderPosition : Int
-    , sound : Sound.Model
     , experiment : Experiment.Experiment
     }
 
@@ -32,16 +34,22 @@ initialModel : Model
 initialModel =
     { screen = Screens.initialScreen
     , questions = Questionnaire.emptyQuestions
+    , instructions = Instructions.emptyInstructions
     , sliderPosition = 50
-    , sound = Sound.emptyModel
     , experiment = Experiment.emptyExperiment
     }
 
 getSound : Model -> Sound.Model
 getSound model = case Screens.toScreen model.screen of
     Screens.QuestionScreen -> Sound.emptyModel
-    Screens.InstructionsScreen -> model.sound
+    Screens.InstructionsScreen -> model.instructions.sound
     Screens.ExperimentScreen -> model.experiment.sound
+
+getSlider : Model -> Slider.Model
+getSlider model = case Screens.toScreen model.screen of
+    Screens.QuestionScreen -> Slider.emptySlider
+    Screens.InstructionsScreen -> model.instructions.slider
+    Screens.ExperimentScreen -> Slider.emptySlider
 
 
 -- UPDATE
@@ -52,7 +60,7 @@ update action model = case action of
     ScreenUpdate u -> { model | screen <- Screens.update u model.screen }
     QuestionnaireUpdate update ->
         { model | questions <- Questionnaire.update update model.questions }
-    DragSlider x -> { model | sliderPosition <- x }
+    SliderUpdate update -> updateSlider update model
     SoundUpdate update -> updateSound update model
     _ -> model
 
@@ -60,10 +68,24 @@ updateSound : Sound.Update -> Model -> Model
 updateSound u model = case Screens.toScreen model.screen of
     Screens.QuestionScreen -> model
     Screens.InstructionsScreen ->
-        { model | sound <- Sound.update u model.sound }
+        let ins = model.instructions
+            newIns = { ins | sound <- Sound.update u ins.sound }
+        in { model | instructions <- newIns }
     Screens.ExperimentScreen ->
         let exp = model.experiment
             newExp = { exp | sound <- Sound.update u exp.sound }
+        in { model | experiment <- newExp }
+
+updateSlider : Slider.Update -> Model -> Model
+updateSlider u model = case Screens.toScreen model.screen of
+    Screens.QuestionScreen -> model
+    Screens.InstructionsScreen ->
+        let ins = model.instructions
+            newIns = { ins | slider <- Slider.update u ins.slider }
+        in { model | instructions <- newIns }
+    Screens.ExperimentScreen ->
+        let exp = model.experiment
+            newExp = { exp | slider <- Slider.update u exp.slider }
         in { model | experiment <- newExp }
 
 
@@ -76,15 +98,7 @@ view model = case Screens.toScreen model.screen of
         , pageBreak
         , row [ Screens.nextScreenButton ]
         ]
-    Screens.InstructionsScreen -> div [ class "container" ]
-        [ prestiTitle
-        , row [ text "Some instructions" ]
-        , slider model.sliderPosition
-        , row [ Screens.previousScreenButton
-              , Sound.replayButton
-              , Screens.nextScreenButton
-              ]
-        ]
+    Screens.InstructionsScreen -> Instructions.view model.instructions
     Screens.ExperimentScreen -> Experiment.view model.experiment
     _ -> row [ text "unknown screen" ]
 
@@ -101,7 +115,7 @@ inputSignal : Signal Action
 inputSignal =
     merge (ScreenUpdate <~ subscribe Screens.screenChannel)
  <| merge (QuestionnaireUpdate <~ subscribe Questionnaire.updateChannel)
- <| merge (DragSlider <~ sliderValue)
+ <| merge (SliderUpdate <~ (Slider.DragSlider <~ sliderValue))
           (SoundUpdate <~ (Sound.SoundPlayed <~ donePlaying))
 
 soundIdSignal : Signal Int

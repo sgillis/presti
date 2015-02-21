@@ -5,6 +5,7 @@ import Html.Attributes (..)
 
 import HtmlConstructs (..)
 import Sound
+import Slider
 
 -- MODELS
 
@@ -12,13 +13,15 @@ type alias Experiment =
     { samples : List Int
     , rates : List Int
     , sound : Sound.Model
+    , slider : Slider.Model
     }
 
 emptyExperiment : Experiment
 emptyExperiment =
     { samples = [1,2,3,4,5]
-    , rates = []
+    , rates = [50,50,50,50,50]
     , sound = { soundId = 1, playSound = True }
+    , slider = 50
     }
 
 type Update = NoOp
@@ -36,7 +39,7 @@ update upd exp = case upd of
 view : Experiment -> Html
 view exp = div [ class "container" ]
     [ prestiTitle
-    , slider 50
+    , Slider.slider exp.slider
     ]
 
 -- UTILS
