@@ -1766,99 +1766,97 @@ Elm.Experiment.make = function (_elm) {
    $Basics = Elm.Basics.make(_elm),
    $Html = Elm.Html.make(_elm),
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Html$Events = Elm.Html.Events.make(_elm),
    $HtmlConstructs = Elm.HtmlConstructs.make(_elm),
-   $List = Elm.List.make(_elm),
+   $ListUtils = Elm.ListUtils.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
    $Slider = Elm.Slider.make(_elm),
    $Sound = Elm.Sound.make(_elm);
-   var set = F3(function (xs,n,x) {
-      return function () {
-         switch (xs.ctor)
-         {case "::": return function () {
-                 switch (n)
-                 {case 0:
-                    return A2($List._op["::"],
-                      x,
-                      xs._1);}
-                 return A2($List._op["::"],
-                 xs._0,
-                 A3(set,xs._1,n - 1,x));
-              }();
-            case "[]":
-            return _L.fromArray([]);}
-         _U.badCase($moduleName,
-         "between lines 63 and 67");
-      }();
-   });
-   _op["!"] = F2(function (xs,n) {
-      return function () {
-         switch (xs.ctor)
-         {case "::": return function () {
-                 switch (n)
-                 {case 0:
-                    return $Maybe.Just(xs._0);}
-                 return A2(_op["!"],xs._1,n - 1);
-              }();
-            case "[]":
-            return $Maybe.Nothing;}
-         _U.badCase($moduleName,
-         "between lines 56 and 60");
-      }();
-   });
    var getSlider = function (exp) {
       return function () {
-         var _v8 = A2(_op["!"],
+         var _v0 = A2($ListUtils._op["!"],
          exp.rates,
          exp.i);
-         switch (_v8.ctor)
+         switch (_v0.ctor)
          {case "Just":
-            return $Slider.slider(_v8._0);
+            return $Slider.slider(_v0._0);
             case "Nothing":
-            return $Html.text("You\'re at the end of the experiment");}
+            return $HtmlConstructs.row(_L.fromArray([$Html.text("You\'re at the end of the experiment")]));}
          _U.badCase($moduleName,
-         "between lines 49 and 51");
+         "between lines 66 and 68");
       }();
    };
-   var view = function (exp) {
-      return A2($Html.div,
-      _L.fromArray([$Html$Attributes.$class("container")]),
-      _L.fromArray([$HtmlConstructs.prestiTitle
-                   ,getSlider(exp)
-                   ,$Html.text($Basics.toString(exp.rates))]));
+   var updateSound = function (exp) {
+      return function () {
+         var _v2 = A2($ListUtils._op["!"],
+         exp.samples,
+         exp.i);
+         switch (_v2.ctor)
+         {case "Just":
+            return _U.replace([["sound"
+                               ,A2($Sound.playSound,
+                               _v2._0,
+                               exp.sound)]],
+              exp);
+            case "Nothing": return exp;}
+         _U.badCase($moduleName,
+         "between lines 48 and 50");
+      }();
    };
    var update = F2(function (upd,
    exp) {
       return function () {
          switch (upd.ctor)
-         {case "NoOp": return exp;
+         {case "Next":
+            return updateSound(_U.replace([["i"
+                                           ,exp.i + 1]],
+              exp));
+            case "NoOp": return exp;
+            case "Previous": return exp;
+            case "Replay":
+            return _U.replace([["sound"
+                               ,$Sound.repeatSound(exp.sound)]],
+              exp);
             case "SliderUpdate":
             return _U.replace([["rates"
-                               ,A3(set,
+                               ,A3($ListUtils.set,
                                exp.rates,
                                exp.i,
                                upd._0)]],
               exp);}
          _U.badCase($moduleName,
-         "between lines 34 and 36");
+         "between lines 40 and 45");
       }();
    });
+   var Replay = {ctor: "Replay"};
+   var Previous = {ctor: "Previous"};
+   var Next = {ctor: "Next"};
    var SliderUpdate = function (a) {
       return {ctor: "SliderUpdate"
              ,_0: a};
    };
    var NoOp = {ctor: "NoOp"};
+   var experimentChannel = $Signal.channel(NoOp);
+   var nextButton = A2($Html.button,
+   _L.fromArray([$Html$Events.onClick(A2($Signal.send,
+   experimentChannel,
+   Next))]),
+   _L.fromArray([$Html.text("Volgend fragment")]));
+   var view = function (exp) {
+      return A2($Html.div,
+      _L.fromArray([$Html$Attributes.$class("container")]),
+      _L.fromArray([$HtmlConstructs.prestiTitle
+                   ,getSlider(exp)
+                   ,$HtmlConstructs.row(_L.fromArray([nextButton]))
+                   ,$HtmlConstructs.row(_L.fromArray([$Html.text($Basics.toString(exp.rates))]))
+                   ,$HtmlConstructs.row(_L.fromArray([$Html.text($Basics.toString(exp.sound))]))
+                   ,$HtmlConstructs.row(_L.fromArray([$Html.text($Basics.toString(exp.i))]))]));
+   };
    var emptyExperiment = {_: {}
                          ,i: 0
-                         ,rates: _L.fromArray([50
-                                              ,50
-                                              ,50
-                                              ,50
-                                              ,50])
-                         ,samples: _L.fromArray([1
-                                                ,2
-                                                ,3
-                                                ,4
-                                                ,5])
+                         ,rates: _L.fromArray([50,50])
+                         ,samples: _L.fromArray([1,2])
                          ,sound: {_: {}
                                  ,playSound: true
                                  ,soundId: 1}};
@@ -1877,10 +1875,15 @@ Elm.Experiment.make = function (_elm) {
                             ,emptyExperiment: emptyExperiment
                             ,NoOp: NoOp
                             ,SliderUpdate: SliderUpdate
+                            ,Next: Next
+                            ,Previous: Previous
+                            ,Replay: Replay
                             ,update: update
+                            ,updateSound: updateSound
                             ,view: view
                             ,getSlider: getSlider
-                            ,set: set};
+                            ,nextButton: nextButton
+                            ,experimentChannel: experimentChannel};
    return _elm.Experiment.values;
 };
 Elm.Graphics = Elm.Graphics || {};
@@ -4180,6 +4183,59 @@ Elm.List.make = function (_elm) {
                       ,sortBy: sortBy
                       ,sortWith: sortWith};
    return _elm.List.values;
+};
+Elm.ListUtils = Elm.ListUtils || {};
+Elm.ListUtils.make = function (_elm) {
+   "use strict";
+   _elm.ListUtils = _elm.ListUtils || {};
+   if (_elm.ListUtils.values)
+   return _elm.ListUtils.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   _P = _N.Ports.make(_elm),
+   $moduleName = "ListUtils",
+   $Basics = Elm.Basics.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm);
+   var set = F3(function (xs,n,x) {
+      return function () {
+         switch (xs.ctor)
+         {case "::": return function () {
+                 switch (n)
+                 {case 0:
+                    return A2($List._op["::"],
+                      x,
+                      xs._1);}
+                 return A2($List._op["::"],
+                 xs._0,
+                 A3(set,xs._1,n - 1,x));
+              }();
+            case "[]":
+            return _L.fromArray([]);}
+         _U.badCase($moduleName,
+         "between lines 12 and 16");
+      }();
+   });
+   _op["!"] = F2(function (xs,n) {
+      return function () {
+         switch (xs.ctor)
+         {case "::": return function () {
+                 switch (n)
+                 {case 0:
+                    return $Maybe.Just(xs._0);}
+                 return A2(_op["!"],xs._1,n - 1);
+              }();
+            case "[]":
+            return $Maybe.Nothing;}
+         _U.badCase($moduleName,
+         "between lines 5 and 9");
+      }();
+   });
+   _elm.ListUtils.values = {_op: _op
+                           ,set: set};
+   return _elm.ListUtils.values;
 };
 Elm.Maybe = Elm.Maybe || {};
 Elm.Maybe.make = function (_elm) {
@@ -10768,7 +10824,7 @@ Elm.Presti.make = function (_elm) {
             case "QuestionScreen":
             return model;}
          _U.badCase($moduleName,
-         "between lines 74 and 85");
+         "between lines 76 and 87");
       }();
    });
    var updateSound = F2(function (u,
@@ -10803,14 +10859,20 @@ Elm.Presti.make = function (_elm) {
             case "QuestionScreen":
             return model;}
          _U.badCase($moduleName,
-         "between lines 62 and 71");
+         "between lines 64 and 73");
       }();
    });
    var update = F2(function (action,
    model) {
       return function () {
          switch (action.ctor)
-         {case "NoOp": return model;
+         {case "ExperimentUpdate":
+            return _U.replace([["experiment"
+                               ,A2($Experiment.update,
+                               action._0,
+                               model.experiment)]],
+              model);
+            case "NoOp": return model;
             case "QuestionnaireUpdate":
             return _U.replace([["questions"
                                ,A2($Questionnaire.update,
@@ -10836,8 +10898,8 @@ Elm.Presti.make = function (_elm) {
    });
    var getSound = function (model) {
       return function () {
-         var _v10 = $Screens.toScreen(model.screen);
-         switch (_v10.ctor)
+         var _v11 = $Screens.toScreen(model.screen);
+         switch (_v11.ctor)
          {case "ExperimentScreen":
             return model.experiment.sound;
             case "InstructionsScreen":
@@ -10852,19 +10914,16 @@ Elm.Presti.make = function (_elm) {
                       ,experiment: $Experiment.emptyExperiment
                       ,instructions: $Instructions.emptyInstructions
                       ,questions: $Questionnaire.emptyQuestions
-                      ,screen: $Screens.initialScreen
-                      ,sliderPosition: 50};
-   var Model = F5(function (a,
+                      ,screen: $Screens.initialScreen};
+   var Model = F4(function (a,
    b,
    c,
-   d,
-   e) {
+   d) {
       return {_: {}
-             ,experiment: e
+             ,experiment: d
              ,instructions: c
              ,questions: b
-             ,screen: a
-             ,sliderPosition: d};
+             ,screen: a};
    });
    var SoundUpdate = function (a) {
       return {ctor: "SoundUpdate"
@@ -10872,6 +10931,10 @@ Elm.Presti.make = function (_elm) {
    };
    var SliderUpdate = function (a) {
       return {ctor: "SliderUpdate"
+             ,_0: a};
+   };
+   var ExperimentUpdate = function (a) {
+      return {ctor: "ExperimentUpdate"
              ,_0: a};
    };
    var QuestionnaireUpdate = function (a) {
@@ -10886,17 +10949,19 @@ Elm.Presti.make = function (_elm) {
    ScreenUpdate,
    $Signal.subscribe($Screens.screenChannel)))($Signal.merge(A2($Signal._op["<~"],
    QuestionnaireUpdate,
-   $Signal.subscribe($Questionnaire.updateChannel)))(A2($Signal.merge,
-   A2($Signal._op["<~"],
+   $Signal.subscribe($Questionnaire.updateChannel)))($Signal.merge(A2($Signal._op["<~"],
    SliderUpdate,
    A2($Signal._op["<~"],
    $Slider.DragSlider,
-   sliderValue)),
+   sliderValue)))(A2($Signal.merge,
    A2($Signal._op["<~"],
    SoundUpdate,
    A2($Signal._op["<~"],
    $Sound.SoundPlayed,
-   donePlaying)))));
+   donePlaying)),
+   A2($Signal._op["<~"],
+   ExperimentUpdate,
+   $Signal.subscribe($Experiment.experimentChannel))))));
    var model = A3($Signal.foldp,
    update,
    initialModel,
@@ -10935,6 +11000,7 @@ Elm.Presti.make = function (_elm) {
                         ,NoOp: NoOp
                         ,ScreenUpdate: ScreenUpdate
                         ,QuestionnaireUpdate: QuestionnaireUpdate
+                        ,ExperimentUpdate: ExperimentUpdate
                         ,SliderUpdate: SliderUpdate
                         ,SoundUpdate: SoundUpdate
                         ,Model: Model
@@ -10968,6 +11034,7 @@ Elm.Questionnaire.make = function (_elm) {
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
    $Html$Events = Elm.Html.Events.make(_elm),
    $HtmlConstructs = Elm.HtmlConstructs.make(_elm),
+   $List = Elm.List.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var update = F2(function (u,q) {
       return function () {
@@ -11066,7 +11133,7 @@ Elm.Questionnaire.make = function (_elm) {
                                ,u._0]],
               q);}
          _U.badCase($moduleName,
-         "between lines 95 and 119");
+         "between lines 97 and 121");
       }();
    });
    var Vraag11 = function (a) {
@@ -11201,6 +11268,47 @@ Elm.Questionnaire.make = function (_elm) {
                                                            })]),
                                               _L.fromArray([]))]))]));
    });
+   var createInput = F4(function (n,
+   toUpdate,
+   curVal,
+   _v24) {
+      return function () {
+         switch (_v24.ctor)
+         {case "_Tuple2":
+            return A2($Html.div,
+              _L.fromArray([$Html$Attributes.$class("input")]),
+              _L.fromArray([A2($Html.input,
+                           _L.fromArray([$Html$Attributes.type$("radio")
+                                        ,$Html$Attributes.name(n)
+                                        ,$Html$Attributes.value(_v24._0)
+                                        ,A3($Html$Events.on,
+                                        "change",
+                                        $Html$Events.targetValue,
+                                        function ($) {
+                                           return $Signal.send(updateChannel)(toUpdate($));
+                                        })
+                                        ,$Html$Attributes.checked(_U.eq(_v24._0,
+                                        curVal))]),
+                           _L.fromArray([]))
+                           ,$Html.text(_v24._1)]));}
+         _U.badCase($moduleName,
+         "between lines 215 and 221");
+      }();
+   });
+   var selectionField = F5(function (options,
+   desc,
+   n,
+   val,
+   toUpdate) {
+      return $HtmlConstructs.row(_L.fromArray([A2($HtmlConstructs.column,
+                                              6,
+                                              _L.fromArray([$Html.text(desc)]))
+                                              ,A2($HtmlConstructs.column,
+                                              6,
+                                              A2($List.map,
+                                              A3(createInput,n,toUpdate,val),
+                                              options))]));
+   });
    var questionScreen = function (q) {
       return A2($Html.div,
       _L.fromArray([$Html$Attributes.$class("questions")]),
@@ -11213,85 +11321,184 @@ Elm.Questionnaire.make = function (_elm) {
                    "Leeftijd",
                    q.leeftijd,
                    Leeftijd)
-                   ,A3(inputField,
-                   "Geslacht (m/v)",
+                   ,A5(selectionField,
+                   _L.fromArray([{ctor: "_Tuple2"
+                                 ,_0: "m"
+                                 ,_1: "Man"}
+                                ,{ctor: "_Tuple2"
+                                 ,_0: "v"
+                                 ,_1: "Vrouw"}]),
+                   "Geslacht",
+                   "geslacht",
                    q.geslacht,
                    Geslacht)
                    ,$HtmlConstructs.row(_L.fromArray([A2($Html.hr,
                    _L.fromArray([]),
                    _L.fromArray([]))]))
-                   ,A3(inputField,
-                   "Heb je gehoorproblemen? (Bv. oorsuizingen, hardhorigheid, ...) (j/n)",
+                   ,A5(selectionField,
+                   _L.fromArray([{ctor: "_Tuple2"
+                                 ,_0: "y"
+                                 ,_1: "Ja"}
+                                ,{ctor: "_Tuple2"
+                                 ,_0: "n"
+                                 ,_1: "Nee"}]),
+                   "Heb je gehoorproblemen? (Bv. oorsuizingen, hardhorigheid, ...)",
+                   "vraag1",
                    q.vraag1,
                    Vraag1)
                    ,A2(commentsField,
                    q.opmerking1,
                    Opmerking1)
-                   ,A3(inputField,
-                   "Heeft iemand in je familie gehoorproblemen? (j/n)",
+                   ,A5(selectionField,
+                   _L.fromArray([{ctor: "_Tuple2"
+                                 ,_0: "y"
+                                 ,_1: "Ja"}
+                                ,{ctor: "_Tuple2"
+                                 ,_0: "n"
+                                 ,_1: "Nee"}]),
+                   "Heeft iemand in je familie gehoorproblemen?",
+                   "vraag2",
                    q.vraag2,
                    Vraag2)
                    ,A2(commentsField,
                    q.opmerking2,
                    Opmerking2)
-                   ,A3(inputField,
-                   "Ben je de laatste 24u gaan zwemmen? (j/n)",
+                   ,A5(selectionField,
+                   _L.fromArray([{ctor: "_Tuple2"
+                                 ,_0: "y"
+                                 ,_1: "Ja"}
+                                ,{ctor: "_Tuple2"
+                                 ,_0: "n"
+                                 ,_1: "Nee"}]),
+                   "Ben je de laatste 24u gaan zwemmen?",
+                   "vraag3",
                    q.vraag3,
                    Vraag3)
                    ,A2(commentsField,
                    q.opmerking3,
                    Opmerking3)
-                   ,A3(inputField,
-                   "Ben je de afgelopen 24u naar een feest of een concert geweest? (j/n)",
+                   ,A5(selectionField,
+                   _L.fromArray([{ctor: "_Tuple2"
+                                 ,_0: "y"
+                                 ,_1: "Ja"}
+                                ,{ctor: "_Tuple2"
+                                 ,_0: "n"
+                                 ,_1: "Nee"}]),
+                   "Ben je de afgelopen 24u naar een feest of een concert geweest?",
+                   "vraag4",
                    q.vraag4,
                    Vraag4)
                    ,A2(commentsField,
                    q.opmerking4,
                    Opmerking4)
-                   ,A3(inputField,
-                   "Ben je verkouden of heb je een oorontsteking? (j/n)",
+                   ,A5(selectionField,
+                   _L.fromArray([{ctor: "_Tuple2"
+                                 ,_0: "y"
+                                 ,_1: "Ja"}
+                                ,{ctor: "_Tuple2"
+                                 ,_0: "n"
+                                 ,_1: "Nee"}]),
+                   "Ben je verkouden of heb je een oorontsteking?",
+                   "vraag5",
                    q.vraag5,
                    Vraag5)
                    ,A2(commentsField,
                    q.opmerking5,
                    Opmerking5)
-                   ,A3(inputField,
-                   "Heb je recent een oorontsteking of verkoudheid gehad? (j/n)",
+                   ,A5(selectionField,
+                   _L.fromArray([{ctor: "_Tuple2"
+                                 ,_0: "y"
+                                 ,_1: "Ja"}
+                                ,{ctor: "_Tuple2"
+                                 ,_0: "n"
+                                 ,_1: "Nee"}]),
+                   "Heb je recent een oorontsteking of verkoudheid gehad?",
+                   "vraag6",
                    q.vraag6,
                    Vraag6)
                    ,A2(commentsField,
                    q.opmerking6,
                    Opmerking6)
-                   ,A3(inputField,
-                   "Heb je andere problemen die tot gehoorverlies kunnen leiden? (j/n)",
+                   ,A5(selectionField,
+                   _L.fromArray([{ctor: "_Tuple2"
+                                 ,_0: "y"
+                                 ,_1: "Ja"}
+                                ,{ctor: "_Tuple2"
+                                 ,_0: "n"
+                                 ,_1: "Nee"}]),
+                   "Heb je andere problemen die tot gehoorverlies kunnen leiden?",
+                   "vraag7",
                    q.vraag7,
                    Vraag7)
                    ,A2(commentsField,
                    q.opmerking7,
                    Opmerking7)
-                   ,A3(inputField,
-                   "Ben je ooit gediagnosticeerd met een ontwikkelingsstoornis (zoals autisme, dyslexie, dyspraxie, taalstoornis, ...)? (j/n)",
+                   ,A5(selectionField,
+                   _L.fromArray([{ctor: "_Tuple2"
+                                 ,_0: "y"
+                                 ,_1: "Ja"}
+                                ,{ctor: "_Tuple2"
+                                 ,_0: "n"
+                                 ,_1: "Nee"}]),
+                   "Ben je ooit gediagnosticeerd met een ontwikkelingsstoornis (zoals autisme, dyslexie, dyspraxie, taalstoornis, ...)?",
+                   "vraag8",
                    q.vraag8,
                    Vraag8)
                    ,A2(commentsField,
                    q.opmerking8,
                    Opmerking8)
-                   ,A3(inputField,
-                   "Heb je een taalkundige achtergrond (beroep, opleiding, ...)? (j/n)",
+                   ,A5(selectionField,
+                   _L.fromArray([{ctor: "_Tuple2"
+                                 ,_0: "y"
+                                 ,_1: "Ja"}
+                                ,{ctor: "_Tuple2"
+                                 ,_0: "n"
+                                 ,_1: "Nee"}]),
+                   "Heb je een taalkundige achtergrond (beroep, opleiding, ...)?",
+                   "vraag9",
                    q.vraag9,
                    Vraag9)
                    ,A2(commentsField,
                    q.opmerking9,
                    Opmerking9)
-                   ,A3(inputField,
-                   "Heb je een fonetische achtergrond? (j/n)",
+                   ,A5(selectionField,
+                   _L.fromArray([{ctor: "_Tuple2"
+                                 ,_0: "y"
+                                 ,_1: "Ja"}
+                                ,{ctor: "_Tuple2"
+                                 ,_0: "n"
+                                 ,_1: "Nee"}]),
+                   "Heb je een fonetische achtergrond?",
+                   "vraag10",
                    q.vraag10,
                    Vraag10)
                    ,A2(commentsField,
                    q.opmerking10,
                    Opmerking10)
-                   ,A3(inputField,
+                   ,A5(selectionField,
+                   _L.fromArray([{ctor: "_Tuple2"
+                                 ,_0: "a"
+                                 ,_1: "Nooit"}
+                                ,{ctor: "_Tuple2"
+                                 ,_0: "b"
+                                 ,_1: "Een keer per jaar"}
+                                ,{ctor: "_Tuple2"
+                                 ,_0: "c"
+                                 ,_1: "Een paar keer per jaar"}
+                                ,{ctor: "_Tuple2"
+                                 ,_0: "d"
+                                 ,_1: "Een keer per maand"}
+                                ,{ctor: "_Tuple2"
+                                 ,_0: "e"
+                                 ,_1: "Een paar keer per maand"}
+                                ,{ctor: "_Tuple2"
+                                 ,_0: "f"
+                                 ,_1: "Elke week"}
+                                ,{ctor: "_Tuple2"
+                                 ,_0: "g"
+                                 ,_1: "Dagelijks"}]),
                    "Hoe vaak kom je met kinderen tussen de 0 en 2 jaar in aanraking?",
+                   "vraag11",
                    q.vraag11,
                    Vraag11)]));
    };
@@ -11420,6 +11627,8 @@ Elm.Questionnaire.make = function (_elm) {
                                ,questionScreen: questionScreen
                                ,inputField: inputField
                                ,commentsField: commentsField
+                               ,selectionField: selectionField
+                               ,createInput: createInput
                                ,updateChannel: updateChannel};
    return _elm.Questionnaire.values;
 };
@@ -11693,7 +11902,7 @@ Elm.Screens.make = function (_elm) {
             case "QuestionScreen":
             return "QuestionScreen";}
          _U.badCase($moduleName,
-         "between lines 23 and 26");
+         "between lines 24 and 27");
       }();
    };
    var NextScreen = {ctor: "NextScreen"};
@@ -11736,7 +11945,7 @@ Elm.Screens.make = function (_elm) {
             case "QuestionScreen":
             return fromScreen(InstructionsScreen);}
          _U.badCase($moduleName,
-         "between lines 50 and 53");
+         "between lines 51 and 54");
       }();
    };
    var previousScreen = function (model) {
@@ -11750,7 +11959,7 @@ Elm.Screens.make = function (_elm) {
             case "QuestionScreen":
             return fromScreen(QuestionScreen);}
          _U.badCase($moduleName,
-         "between lines 44 and 47");
+         "between lines 45 and 48");
       }();
    };
    var update = F2(function (u,
@@ -11762,7 +11971,7 @@ Elm.Screens.make = function (_elm) {
             case "PreviousScreen":
             return previousScreen(model);}
          _U.badCase($moduleName,
-         "between lines 39 and 41");
+         "between lines 40 and 42");
       }();
    });
    _elm.Screens.values = {_op: _op
@@ -11986,6 +12195,12 @@ Elm.Sound.make = function (_elm) {
    var replayButton = A2($Html.button,
    _L.fromArray([$Html$Events.onClick(sendPlay)]),
    _L.fromArray([$Html.text("Herbeluister")]));
+   var setSound = F2(function (x,
+   model) {
+      return _U.replace([["soundId"
+                         ,x]],
+      model);
+   });
    var repeatSound = function (model) {
       return _U.replace([["playSound"
                          ,true]],
@@ -12038,6 +12253,7 @@ Elm.Sound.make = function (_elm) {
                        ,update: update
                        ,playSound: playSound
                        ,repeatSound: repeatSound
+                       ,setSound: setSound
                        ,replayButton: replayButton
                        ,soundChannel: soundChannel
                        ,sendPlay: sendPlay};

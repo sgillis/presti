@@ -1,9 +1,11 @@
 module Questionnaire where
 
 import Html (..)
+import Html
 import Html.Attributes (..)
 import Html.Events (..)
 import Signal (..)
+import List
 
 import HtmlConstructs (..)
 
@@ -127,51 +129,59 @@ questionScreen q =
         , row [ text "Welcome to PreSti!" ]
         , row [ hr [] [] ]
         , inputField "Leeftijd" q.leeftijd Leeftijd
-        , inputField "Geslacht (m/v)" q.geslacht Geslacht
+        , selectionField [("m", "Man"), ("v", "Vrouw")]
+                         "Geslacht" "geslacht" q.geslacht Geslacht
         , row [ hr [] [] ]
-        , inputField
-            "Heb je gehoorproblemen? (Bv. oorsuizingen, hardhorigheid, ...) (j/n)"
-            q.vraag1 Vraag1
+        , selectionField [("y", "Ja"), ("n", "Nee")]
+            "Heb je gehoorproblemen? (Bv. oorsuizingen, hardhorigheid, ...)"
+            "vraag1" q.vraag1 Vraag1
         , commentsField q.opmerking1 Opmerking1
-        , inputField
-            "Heeft iemand in je familie gehoorproblemen? (j/n)"
-            q.vraag2 Vraag2
+        , selectionField [("y", "Ja"), ("n", "Nee")]
+            "Heeft iemand in je familie gehoorproblemen?"
+            "vraag2" q.vraag2 Vraag2
         , commentsField q.opmerking2 Opmerking2
-        , inputField
-            "Ben je de laatste 24u gaan zwemmen? (j/n)"
-            q.vraag3 Vraag3
+        , selectionField [("y", "Ja"), ("n", "Nee")]
+            "Ben je de laatste 24u gaan zwemmen?"
+            "vraag3" q.vraag3 Vraag3
         , commentsField q.opmerking3 Opmerking3
-        , inputField
-            "Ben je de afgelopen 24u naar een feest of een concert geweest? (j/n)"
-            q.vraag4 Vraag4
+        , selectionField [("y", "Ja"), ("n", "Nee")]
+            "Ben je de afgelopen 24u naar een feest of een concert geweest?"
+            "vraag4" q.vraag4 Vraag4
         , commentsField q.opmerking4 Opmerking4
-        , inputField
-            "Ben je verkouden of heb je een oorontsteking? (j/n)"
-            q.vraag5 Vraag5
+        , selectionField [("y", "Ja"), ("n", "Nee")]
+            "Ben je verkouden of heb je een oorontsteking?"
+            "vraag5" q.vraag5 Vraag5
         , commentsField q.opmerking5 Opmerking5
-        , inputField
-            "Heb je recent een oorontsteking of verkoudheid gehad? (j/n)"
-            q.vraag6 Vraag6
+        , selectionField [("y", "Ja"), ("n", "Nee")]
+            "Heb je recent een oorontsteking of verkoudheid gehad?"
+            "vraag6" q.vraag6 Vraag6
         , commentsField q.opmerking6 Opmerking6
-        , inputField
-            "Heb je andere problemen die tot gehoorverlies kunnen leiden? (j/n)"
-            q.vraag7 Vraag7
+        , selectionField [("y", "Ja"), ("n", "Nee")]
+            "Heb je andere problemen die tot gehoorverlies kunnen leiden?"
+            "vraag7" q.vraag7 Vraag7
         , commentsField q.opmerking7 Opmerking7
-        , inputField
-            "Ben je ooit gediagnosticeerd met een ontwikkelingsstoornis (zoals autisme, dyslexie, dyspraxie, taalstoornis, ...)? (j/n)"
-            q.vraag8 Vraag8
+        , selectionField [("y", "Ja"), ("n", "Nee")]
+            "Ben je ooit gediagnosticeerd met een ontwikkelingsstoornis (zoals autisme, dyslexie, dyspraxie, taalstoornis, ...)?"
+            "vraag8" q.vraag8 Vraag8
         , commentsField q.opmerking8 Opmerking8
-        , inputField
-            "Heb je een taalkundige achtergrond (beroep, opleiding, ...)? (j/n)"
-            q.vraag9 Vraag9
+        , selectionField [("y", "Ja"), ("n", "Nee")]
+            "Heb je een taalkundige achtergrond (beroep, opleiding, ...)?"
+            "vraag9" q.vraag9 Vraag9
         , commentsField q.opmerking9 Opmerking9
-        , inputField
-            "Heb je een fonetische achtergrond? (j/n)"
-            q.vraag10 Vraag10
+        , selectionField [("y", "Ja"), ("n", "Nee")]
+            "Heb je een fonetische achtergrond?"
+            "vraag10" q.vraag10 Vraag10
         , commentsField q.opmerking10 Opmerking10
-        , inputField
+        , selectionField [ ("a", "Nooit")
+                         , ("b", "Een keer per jaar")
+                         , ("c", "Een paar keer per jaar")
+                         , ("d", "Een keer per maand")
+                         , ("e", "Een paar keer per maand")
+                         , ("f", "Elke week")
+                         , ("g", "Dagelijks")
+                         ]
             "Hoe vaak kom je met kinderen tussen de 0 en 2 jaar in aanraking?"
-            q.vraag11 Vraag11
+            "vraag11" q.vraag11 Vraag11
         ]
 
 inputField : String -> String -> (String -> Update) -> Html
@@ -193,6 +203,22 @@ commentsField val toUpdate = row
                  , on "input" targetValue (send updateChannel << toUpdate)
                  ] [ ]
                ] ]
+
+selectionField : List (String, String) -> String -> String -> String ->
+                 (String -> Update) -> Html
+selectionField options desc n val toUpdate = row
+    [ column 6 [ text desc ]
+    , column 6 (List.map (createInput n toUpdate val) options)
+    ]
+
+createInput : String -> (String -> Update) -> String -> (String, String) -> Html
+createInput n toUpdate curVal (val, desc) = div [ class "input" ]
+    [ input [ type' "radio", name n, value val
+            , on "change" targetValue (send updateChannel << toUpdate)
+            , checked (val==curVal) ]
+            [ ]
+    , text desc
+    ]
 
 
 -- CHANNELS
