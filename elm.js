@@ -10752,7 +10752,6 @@ Elm.Presti.make = function (_elm) {
    $Basics = Elm.Basics.make(_elm),
    $Experiment = Elm.Experiment.make(_elm),
    $Html = Elm.Html.make(_elm),
-   $Html$Attributes = Elm.Html.Attributes.make(_elm),
    $HtmlConstructs = Elm.HtmlConstructs.make(_elm),
    $Instructions = Elm.Instructions.make(_elm),
    $Questionnaire = Elm.Questionnaire.make(_elm),
@@ -10785,11 +10784,7 @@ Elm.Presti.make = function (_elm) {
             case "InstructionsScreen":
             return $Instructions.view(model.instructions);
             case "QuestionScreen":
-            return A2($Html.div,
-              _L.fromArray([$Html$Attributes.$class("container")]),
-              _L.fromArray([$Questionnaire.questionScreen(model.questions)
-                           ,$HtmlConstructs.pageBreak
-                           ,$HtmlConstructs.row(_L.fromArray([$Screens.nextScreenButton]))]));}
+            return $Questionnaire.view(model.questions);}
          return $HtmlConstructs.row(_L.fromArray([$Html.text("unknown screen")]));
       }();
    };
@@ -11035,107 +11030,18 @@ Elm.Questionnaire.make = function (_elm) {
    $Html$Events = Elm.Html.Events.make(_elm),
    $HtmlConstructs = Elm.HtmlConstructs.make(_elm),
    $List = Elm.List.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var update = F2(function (u,q) {
-      return function () {
-         switch (u.ctor)
-         {case "Geslacht":
-            return _U.replace([["geslacht"
-                               ,u._0]],
-              q);
-            case "Leeftijd":
-            return _U.replace([["leeftijd"
-                               ,u._0]],
-              q);
-            case "NoOp": return q;
-            case "Opmerking1":
-            return _U.replace([["opmerking1"
-                               ,u._0]],
-              q);
-            case "Opmerking10":
-            return _U.replace([["opmerking10"
-                               ,u._0]],
-              q);
-            case "Opmerking2":
-            return _U.replace([["opmerking2"
-                               ,u._0]],
-              q);
-            case "Opmerking3":
-            return _U.replace([["opmerking3"
-                               ,u._0]],
-              q);
-            case "Opmerking4":
-            return _U.replace([["opmerking4"
-                               ,u._0]],
-              q);
-            case "Opmerking5":
-            return _U.replace([["opmerking5"
-                               ,u._0]],
-              q);
-            case "Opmerking6":
-            return _U.replace([["opmerking6"
-                               ,u._0]],
-              q);
-            case "Opmerking7":
-            return _U.replace([["opmerking7"
-                               ,u._0]],
-              q);
-            case "Opmerking8":
-            return _U.replace([["opmerking8"
-                               ,u._0]],
-              q);
-            case "Opmerking9":
-            return _U.replace([["opmerking9"
-                               ,u._0]],
-              q);
-            case "Vraag1":
-            return _U.replace([["vraag1"
-                               ,u._0]],
-              q);
-            case "Vraag10":
-            return _U.replace([["vraag10"
-                               ,u._0]],
-              q);
-            case "Vraag11":
-            return _U.replace([["vraag11"
-                               ,u._0]],
-              q);
-            case "Vraag2":
-            return _U.replace([["vraag2"
-                               ,u._0]],
-              q);
-            case "Vraag3":
-            return _U.replace([["vraag3"
-                               ,u._0]],
-              q);
-            case "Vraag4":
-            return _U.replace([["vraag4"
-                               ,u._0]],
-              q);
-            case "Vraag5":
-            return _U.replace([["vraag5"
-                               ,u._0]],
-              q);
-            case "Vraag6":
-            return _U.replace([["vraag6"
-                               ,u._0]],
-              q);
-            case "Vraag7":
-            return _U.replace([["vraag7"
-                               ,u._0]],
-              q);
-            case "Vraag8":
-            return _U.replace([["vraag8"
-                               ,u._0]],
-              q);
-            case "Vraag9":
-            return _U.replace([["vraag9"
-                               ,u._0]],
-              q);}
-         _U.badCase($moduleName,
-         "between lines 97 and 121");
-      }();
-   });
+   $Result = Elm.Result.make(_elm),
+   $Screens = Elm.Screens.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $String = Elm.String.make(_elm);
+   var getValidationErrorColor = function (b) {
+      return b ? $Html$Attributes.style(_L.fromArray([{ctor: "_Tuple2"
+                                                      ,_0: "color"
+                                                      ,_1: "red"}])) : $Html$Attributes.style(_L.fromArray([{ctor: "_Tuple2"
+                                                                                                            ,_0: "color"
+                                                                                                            ,_1: "black"}]));
+   };
+   var TrySend = {ctor: "TrySend"};
    var Vraag11 = function (a) {
       return {ctor: "Vraag11"
              ,_0: a};
@@ -11230,12 +11136,15 @@ Elm.Questionnaire.make = function (_elm) {
    };
    var NoOp = {ctor: "NoOp"};
    var updateChannel = $Signal.channel(NoOp);
-   var inputField = F3(function (desc,
+   var inputField = F4(function (error,
+   desc,
    val,
    toUpdate) {
       return $HtmlConstructs.row(_L.fromArray([A2($HtmlConstructs.column,
                                               6,
-                                              _L.fromArray([$Html.text(desc)]))
+                                              _L.fromArray([A2($Html.span,
+                                              _L.fromArray([getValidationErrorColor(error)]),
+                                              _L.fromArray([$Html.text(desc)]))]))
                                               ,A2($HtmlConstructs.column,
                                               6,
                                               _L.fromArray([A2($Html.input,
@@ -11271,45 +11180,48 @@ Elm.Questionnaire.make = function (_elm) {
    var createInput = F4(function (n,
    toUpdate,
    curVal,
-   _v24) {
+   _v0) {
       return function () {
-         switch (_v24.ctor)
+         switch (_v0.ctor)
          {case "_Tuple2":
             return A2($Html.div,
               _L.fromArray([$Html$Attributes.$class("input")]),
               _L.fromArray([A2($Html.input,
                            _L.fromArray([$Html$Attributes.type$("radio")
                                         ,$Html$Attributes.name(n)
-                                        ,$Html$Attributes.value(_v24._0)
+                                        ,$Html$Attributes.value(_v0._0)
                                         ,A3($Html$Events.on,
                                         "change",
                                         $Html$Events.targetValue,
                                         function ($) {
                                            return $Signal.send(updateChannel)(toUpdate($));
                                         })
-                                        ,$Html$Attributes.checked(_U.eq(_v24._0,
+                                        ,$Html$Attributes.checked(_U.eq(_v0._0,
                                         curVal))]),
                            _L.fromArray([]))
-                           ,$Html.text(_v24._1)]));}
+                           ,$Html.text(_v0._1)]));}
          _U.badCase($moduleName,
-         "between lines 215 and 221");
+         "between lines 309 and 315");
       }();
    });
-   var selectionField = F5(function (options,
+   var selectionField = F6(function (options,
+   error,
    desc,
    n,
    val,
    toUpdate) {
       return $HtmlConstructs.row(_L.fromArray([A2($HtmlConstructs.column,
                                               6,
-                                              _L.fromArray([$Html.text(desc)]))
+                                              _L.fromArray([A2($Html.span,
+                                              _L.fromArray([getValidationErrorColor(error)]),
+                                              _L.fromArray([$Html.text(desc)]))]))
                                               ,A2($HtmlConstructs.column,
                                               6,
                                               A2($List.map,
                                               A3(createInput,n,toUpdate,val),
                                               options))]));
    });
-   var questionScreen = function (q) {
+   var questions = function (q) {
       return A2($Html.div,
       _L.fromArray([$Html$Attributes.$class("questions")]),
       _L.fromArray([$HtmlConstructs.prestiTitle
@@ -11317,17 +11229,19 @@ Elm.Questionnaire.make = function (_elm) {
                    ,$HtmlConstructs.row(_L.fromArray([A2($Html.hr,
                    _L.fromArray([]),
                    _L.fromArray([]))]))
-                   ,A3(inputField,
+                   ,A4(inputField,
+                   q.errors.leeftijd,
                    "Leeftijd",
                    q.leeftijd,
                    Leeftijd)
-                   ,A5(selectionField,
+                   ,A6(selectionField,
                    _L.fromArray([{ctor: "_Tuple2"
                                  ,_0: "m"
                                  ,_1: "Man"}
                                 ,{ctor: "_Tuple2"
                                  ,_0: "v"
                                  ,_1: "Vrouw"}]),
+                   q.errors.geslacht,
                    "Geslacht",
                    "geslacht",
                    q.geslacht,
@@ -11335,13 +11249,14 @@ Elm.Questionnaire.make = function (_elm) {
                    ,$HtmlConstructs.row(_L.fromArray([A2($Html.hr,
                    _L.fromArray([]),
                    _L.fromArray([]))]))
-                   ,A5(selectionField,
+                   ,A6(selectionField,
                    _L.fromArray([{ctor: "_Tuple2"
                                  ,_0: "y"
                                  ,_1: "Ja"}
                                 ,{ctor: "_Tuple2"
                                  ,_0: "n"
                                  ,_1: "Nee"}]),
+                   q.errors.vraag1,
                    "Heb je gehoorproblemen? (Bv. oorsuizingen, hardhorigheid, ...)",
                    "vraag1",
                    q.vraag1,
@@ -11349,13 +11264,14 @@ Elm.Questionnaire.make = function (_elm) {
                    ,A2(commentsField,
                    q.opmerking1,
                    Opmerking1)
-                   ,A5(selectionField,
+                   ,A6(selectionField,
                    _L.fromArray([{ctor: "_Tuple2"
                                  ,_0: "y"
                                  ,_1: "Ja"}
                                 ,{ctor: "_Tuple2"
                                  ,_0: "n"
                                  ,_1: "Nee"}]),
+                   q.errors.vraag2,
                    "Heeft iemand in je familie gehoorproblemen?",
                    "vraag2",
                    q.vraag2,
@@ -11363,13 +11279,14 @@ Elm.Questionnaire.make = function (_elm) {
                    ,A2(commentsField,
                    q.opmerking2,
                    Opmerking2)
-                   ,A5(selectionField,
+                   ,A6(selectionField,
                    _L.fromArray([{ctor: "_Tuple2"
                                  ,_0: "y"
                                  ,_1: "Ja"}
                                 ,{ctor: "_Tuple2"
                                  ,_0: "n"
                                  ,_1: "Nee"}]),
+                   q.errors.vraag3,
                    "Ben je de laatste 24u gaan zwemmen?",
                    "vraag3",
                    q.vraag3,
@@ -11377,13 +11294,14 @@ Elm.Questionnaire.make = function (_elm) {
                    ,A2(commentsField,
                    q.opmerking3,
                    Opmerking3)
-                   ,A5(selectionField,
+                   ,A6(selectionField,
                    _L.fromArray([{ctor: "_Tuple2"
                                  ,_0: "y"
                                  ,_1: "Ja"}
                                 ,{ctor: "_Tuple2"
                                  ,_0: "n"
                                  ,_1: "Nee"}]),
+                   q.errors.vraag4,
                    "Ben je de afgelopen 24u naar een feest of een concert geweest?",
                    "vraag4",
                    q.vraag4,
@@ -11391,13 +11309,14 @@ Elm.Questionnaire.make = function (_elm) {
                    ,A2(commentsField,
                    q.opmerking4,
                    Opmerking4)
-                   ,A5(selectionField,
+                   ,A6(selectionField,
                    _L.fromArray([{ctor: "_Tuple2"
                                  ,_0: "y"
                                  ,_1: "Ja"}
                                 ,{ctor: "_Tuple2"
                                  ,_0: "n"
                                  ,_1: "Nee"}]),
+                   q.errors.vraag5,
                    "Ben je verkouden of heb je een oorontsteking?",
                    "vraag5",
                    q.vraag5,
@@ -11405,13 +11324,14 @@ Elm.Questionnaire.make = function (_elm) {
                    ,A2(commentsField,
                    q.opmerking5,
                    Opmerking5)
-                   ,A5(selectionField,
+                   ,A6(selectionField,
                    _L.fromArray([{ctor: "_Tuple2"
                                  ,_0: "y"
                                  ,_1: "Ja"}
                                 ,{ctor: "_Tuple2"
                                  ,_0: "n"
                                  ,_1: "Nee"}]),
+                   q.errors.vraag6,
                    "Heb je recent een oorontsteking of verkoudheid gehad?",
                    "vraag6",
                    q.vraag6,
@@ -11419,13 +11339,14 @@ Elm.Questionnaire.make = function (_elm) {
                    ,A2(commentsField,
                    q.opmerking6,
                    Opmerking6)
-                   ,A5(selectionField,
+                   ,A6(selectionField,
                    _L.fromArray([{ctor: "_Tuple2"
                                  ,_0: "y"
                                  ,_1: "Ja"}
                                 ,{ctor: "_Tuple2"
                                  ,_0: "n"
                                  ,_1: "Nee"}]),
+                   q.errors.vraag7,
                    "Heb je andere problemen die tot gehoorverlies kunnen leiden?",
                    "vraag7",
                    q.vraag7,
@@ -11433,13 +11354,14 @@ Elm.Questionnaire.make = function (_elm) {
                    ,A2(commentsField,
                    q.opmerking7,
                    Opmerking7)
-                   ,A5(selectionField,
+                   ,A6(selectionField,
                    _L.fromArray([{ctor: "_Tuple2"
                                  ,_0: "y"
                                  ,_1: "Ja"}
                                 ,{ctor: "_Tuple2"
                                  ,_0: "n"
                                  ,_1: "Nee"}]),
+                   q.errors.vraag8,
                    "Ben je ooit gediagnosticeerd met een ontwikkelingsstoornis (zoals autisme, dyslexie, dyspraxie, taalstoornis, ...)?",
                    "vraag8",
                    q.vraag8,
@@ -11447,13 +11369,14 @@ Elm.Questionnaire.make = function (_elm) {
                    ,A2(commentsField,
                    q.opmerking8,
                    Opmerking8)
-                   ,A5(selectionField,
+                   ,A6(selectionField,
                    _L.fromArray([{ctor: "_Tuple2"
                                  ,_0: "y"
                                  ,_1: "Ja"}
                                 ,{ctor: "_Tuple2"
                                  ,_0: "n"
                                  ,_1: "Nee"}]),
+                   q.errors.vraag9,
                    "Heb je een taalkundige achtergrond (beroep, opleiding, ...)?",
                    "vraag9",
                    q.vraag9,
@@ -11461,13 +11384,14 @@ Elm.Questionnaire.make = function (_elm) {
                    ,A2(commentsField,
                    q.opmerking9,
                    Opmerking9)
-                   ,A5(selectionField,
+                   ,A6(selectionField,
                    _L.fromArray([{ctor: "_Tuple2"
                                  ,_0: "y"
                                  ,_1: "Ja"}
                                 ,{ctor: "_Tuple2"
                                  ,_0: "n"
                                  ,_1: "Nee"}]),
+                   q.errors.vraag10,
                    "Heb je een fonetische achtergrond?",
                    "vraag10",
                    q.vraag10,
@@ -11475,7 +11399,7 @@ Elm.Questionnaire.make = function (_elm) {
                    ,A2(commentsField,
                    q.opmerking10,
                    Opmerking10)
-                   ,A5(selectionField,
+                   ,A6(selectionField,
                    _L.fromArray([{ctor: "_Tuple2"
                                  ,_0: "a"
                                  ,_1: "Nooit"}
@@ -11497,12 +11421,242 @@ Elm.Questionnaire.make = function (_elm) {
                                 ,{ctor: "_Tuple2"
                                  ,_0: "g"
                                  ,_1: "Dagelijks"}]),
+                   q.errors.vraag11,
                    "Hoe vaak kom je met kinderen tussen de 0 en 2 jaar in aanraking?",
                    "vraag11",
                    q.vraag11,
                    Vraag11)]));
    };
+   var emptyValidationErrors = {_: {}
+                               ,geslacht: false
+                               ,leeftijd: false
+                               ,vraag1: false
+                               ,vraag10: false
+                               ,vraag11: false
+                               ,vraag2: false
+                               ,vraag3: false
+                               ,vraag4: false
+                               ,vraag5: false
+                               ,vraag6: false
+                               ,vraag7: false
+                               ,vraag8: false
+                               ,vraag9: false};
+   var ValidationErrors = function (a) {
+      return function (b) {
+         return function (c) {
+            return function (d) {
+               return function (e) {
+                  return function (f) {
+                     return function (g) {
+                        return function (h) {
+                           return function (i) {
+                              return function (j) {
+                                 return function (k) {
+                                    return function (l) {
+                                       return function (m) {
+                                          return {_: {}
+                                                 ,geslacht: b
+                                                 ,leeftijd: a
+                                                 ,vraag1: c
+                                                 ,vraag10: l
+                                                 ,vraag11: m
+                                                 ,vraag2: d
+                                                 ,vraag3: e
+                                                 ,vraag4: f
+                                                 ,vraag5: g
+                                                 ,vraag6: h
+                                                 ,vraag7: i
+                                                 ,vraag8: j
+                                                 ,vraag9: k};
+                                       };
+                                    };
+                                 };
+                              };
+                           };
+                        };
+                     };
+                  };
+               };
+            };
+         };
+      };
+   };
+   var setValidationErrors = function (q) {
+      return function () {
+         var isInt = function (s) {
+            return function () {
+               var _v4 = $String.toInt(s);
+               switch (_v4.ctor)
+               {case "Err": return false;
+                  case "Ok": return true;}
+               _U.badCase($moduleName,
+               "between lines 96 and 99");
+            }();
+         };
+         var newErrors = _U.replace([["leeftijd"
+                                     ,$Basics.not(isInt(q.leeftijd))]
+                                    ,["geslacht"
+                                     ,_U.eq(q.geslacht,"")]
+                                    ,["vraag1",_U.eq(q.vraag1,"")]
+                                    ,["vraag2",_U.eq(q.vraag2,"")]
+                                    ,["vraag3",_U.eq(q.vraag3,"")]
+                                    ,["vraag4",_U.eq(q.vraag4,"")]
+                                    ,["vraag5",_U.eq(q.vraag5,"")]
+                                    ,["vraag6",_U.eq(q.vraag6,"")]
+                                    ,["vraag7",_U.eq(q.vraag7,"")]
+                                    ,["vraag8",_U.eq(q.vraag8,"")]
+                                    ,["vraag9",_U.eq(q.vraag9,"")]
+                                    ,["vraag10",_U.eq(q.vraag10,"")]
+                                    ,["vraag11"
+                                     ,_U.eq(q.vraag11,"")]],
+         emptyValidationErrors);
+         return _U.replace([["errors"
+                            ,newErrors]],
+         q);
+      }();
+   };
+   var update = F2(function (u,q) {
+      return function () {
+         switch (u.ctor)
+         {case "Geslacht":
+            return _U.replace([["geslacht"
+                               ,u._0]],
+              q);
+            case "Leeftijd":
+            return _U.replace([["leeftijd"
+                               ,u._0]],
+              q);
+            case "NoOp": return q;
+            case "Opmerking1":
+            return _U.replace([["opmerking1"
+                               ,u._0]],
+              q);
+            case "Opmerking10":
+            return _U.replace([["opmerking10"
+                               ,u._0]],
+              q);
+            case "Opmerking2":
+            return _U.replace([["opmerking2"
+                               ,u._0]],
+              q);
+            case "Opmerking3":
+            return _U.replace([["opmerking3"
+                               ,u._0]],
+              q);
+            case "Opmerking4":
+            return _U.replace([["opmerking4"
+                               ,u._0]],
+              q);
+            case "Opmerking5":
+            return _U.replace([["opmerking5"
+                               ,u._0]],
+              q);
+            case "Opmerking6":
+            return _U.replace([["opmerking6"
+                               ,u._0]],
+              q);
+            case "Opmerking7":
+            return _U.replace([["opmerking7"
+                               ,u._0]],
+              q);
+            case "Opmerking8":
+            return _U.replace([["opmerking8"
+                               ,u._0]],
+              q);
+            case "Opmerking9":
+            return _U.replace([["opmerking9"
+                               ,u._0]],
+              q);
+            case "TrySend":
+            return setValidationErrors(q);
+            case "Vraag1":
+            return _U.replace([["vraag1"
+                               ,u._0]],
+              q);
+            case "Vraag10":
+            return _U.replace([["vraag10"
+                               ,u._0]],
+              q);
+            case "Vraag11":
+            return _U.replace([["vraag11"
+                               ,u._0]],
+              q);
+            case "Vraag2":
+            return _U.replace([["vraag2"
+                               ,u._0]],
+              q);
+            case "Vraag3":
+            return _U.replace([["vraag3"
+                               ,u._0]],
+              q);
+            case "Vraag4":
+            return _U.replace([["vraag4"
+                               ,u._0]],
+              q);
+            case "Vraag5":
+            return _U.replace([["vraag5"
+                               ,u._0]],
+              q);
+            case "Vraag6":
+            return _U.replace([["vraag6"
+                               ,u._0]],
+              q);
+            case "Vraag7":
+            return _U.replace([["vraag7"
+                               ,u._0]],
+              q);
+            case "Vraag8":
+            return _U.replace([["vraag8"
+                               ,u._0]],
+              q);
+            case "Vraag9":
+            return _U.replace([["vraag9"
+                               ,u._0]],
+              q);}
+         _U.badCase($moduleName,
+         "between lines 178 and 203");
+      }();
+   });
+   var validateModel = function (q) {
+      return function () {
+         var isInt = function (s) {
+            return function () {
+               var _v31 = $String.toInt(s);
+               switch (_v31.ctor)
+               {case "Err": return false;
+                  case "Ok": return true;}
+               _U.badCase($moduleName,
+               "between lines 74 and 77");
+            }();
+         };
+         return isInt(q.leeftijd) && (!_U.eq(q.geslacht,
+         "") && (!_U.eq(q.vraag1,
+         "") && (!_U.eq(q.vraag2,
+         "") && (!_U.eq(q.vraag3,
+         "") && (!_U.eq(q.vraag4,
+         "") && (!_U.eq(q.vraag5,
+         "") && (!_U.eq(q.vraag6,
+         "") && (!_U.eq(q.vraag7,
+         "") && (!_U.eq(q.vraag8,
+         "") && (!_U.eq(q.vraag9,
+         "") && (!_U.eq(q.vraag10,
+         "") && !_U.eq(q.vraag11,
+         "")))))))))))) ? true : false;
+      }();
+   };
+   var view = function (q) {
+      return A2($Html.div,
+      _L.fromArray([$Html$Attributes.$class("container")]),
+      _L.fromArray([questions(q)
+                   ,$HtmlConstructs.pageBreak
+                   ,validateModel(q) ? $HtmlConstructs.row(_L.fromArray([$Screens.nextScreenButton])) : $HtmlConstructs.row(_L.fromArray([A2($Html.button,
+                   _L.fromArray([$Html$Events.onClick(A2($Signal.send,
+                   updateChannel,
+                   TrySend))]),
+                   _L.fromArray([$Html.text("Volgende scherm")]))]))]));
+   };
    var emptyQuestions = {_: {}
+                        ,errors: emptyValidationErrors
                         ,geslacht: ""
                         ,leeftijd: ""
                         ,opmerking1: ""
@@ -11549,30 +11703,33 @@ Elm.Questionnaire.make = function (_elm) {
                                                                return function (u) {
                                                                   return function (v) {
                                                                      return function (w) {
-                                                                        return {_: {}
-                                                                               ,geslacht: b
-                                                                               ,leeftijd: a
-                                                                               ,opmerking1: d
-                                                                               ,opmerking10: v
-                                                                               ,opmerking2: f
-                                                                               ,opmerking3: h
-                                                                               ,opmerking4: j
-                                                                               ,opmerking5: l
-                                                                               ,opmerking6: n
-                                                                               ,opmerking7: p
-                                                                               ,opmerking8: r
-                                                                               ,opmerking9: t
-                                                                               ,vraag1: c
-                                                                               ,vraag10: u
-                                                                               ,vraag11: w
-                                                                               ,vraag2: e
-                                                                               ,vraag3: g
-                                                                               ,vraag4: i
-                                                                               ,vraag5: k
-                                                                               ,vraag6: m
-                                                                               ,vraag7: o
-                                                                               ,vraag8: q
-                                                                               ,vraag9: s};
+                                                                        return function (x) {
+                                                                           return {_: {}
+                                                                                  ,errors: x
+                                                                                  ,geslacht: b
+                                                                                  ,leeftijd: a
+                                                                                  ,opmerking1: d
+                                                                                  ,opmerking10: v
+                                                                                  ,opmerking2: f
+                                                                                  ,opmerking3: h
+                                                                                  ,opmerking4: j
+                                                                                  ,opmerking5: l
+                                                                                  ,opmerking6: n
+                                                                                  ,opmerking7: p
+                                                                                  ,opmerking8: r
+                                                                                  ,opmerking9: t
+                                                                                  ,vraag1: c
+                                                                                  ,vraag10: u
+                                                                                  ,vraag11: w
+                                                                                  ,vraag2: e
+                                                                                  ,vraag3: g
+                                                                                  ,vraag4: i
+                                                                                  ,vraag5: k
+                                                                                  ,vraag6: m
+                                                                                  ,vraag7: o
+                                                                                  ,vraag8: q
+                                                                                  ,vraag9: s};
+                                                                        };
                                                                      };
                                                                   };
                                                                };
@@ -11599,6 +11756,10 @@ Elm.Questionnaire.make = function (_elm) {
    _elm.Questionnaire.values = {_op: _op
                                ,Questions: Questions
                                ,emptyQuestions: emptyQuestions
+                               ,validateModel: validateModel
+                               ,setValidationErrors: setValidationErrors
+                               ,ValidationErrors: ValidationErrors
+                               ,emptyValidationErrors: emptyValidationErrors
                                ,NoOp: NoOp
                                ,Leeftijd: Leeftijd
                                ,Geslacht: Geslacht
@@ -11623,12 +11784,15 @@ Elm.Questionnaire.make = function (_elm) {
                                ,Vraag10: Vraag10
                                ,Opmerking10: Opmerking10
                                ,Vraag11: Vraag11
+                               ,TrySend: TrySend
                                ,update: update
-                               ,questionScreen: questionScreen
+                               ,view: view
+                               ,questions: questions
                                ,inputField: inputField
                                ,commentsField: commentsField
                                ,selectionField: selectionField
                                ,createInput: createInput
+                               ,getValidationErrorColor: getValidationErrorColor
                                ,updateChannel: updateChannel};
    return _elm.Questionnaire.values;
 };

@@ -91,11 +91,7 @@ updateSlider u model = case Screens.toScreen model.screen of
 
 view : Model -> Html
 view model = case Screens.toScreen model.screen of
-    Screens.QuestionScreen -> div [ class "container" ]
-        [ Questionnaire.questionScreen model.questions
-        , pageBreak
-        , row [ Screens.nextScreenButton ]
-        ]
+    Screens.QuestionScreen -> Questionnaire.view model.questions
     Screens.InstructionsScreen -> Instructions.view model.instructions
     Screens.ExperimentScreen -> Experiment.view model.experiment
     _ -> row [ text "unknown screen" ]
