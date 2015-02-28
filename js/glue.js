@@ -20,19 +20,25 @@ var sound = (function(){
     return object;
 })();
 
-function play_sound(bool){
-    console.log('Got the value: ', bool);
-    if(bool){
-        var element = sound.get_sound_element()
-        if (element != null) {
-            element.play();
-            presti.ports.donePlaying.send(true);
-        }
+function play_sound(){
+    var element = sound.get_sound_element();
+    console.log(element);
+    if (element != null) {
+        element.play();
+        presti.ports.donePlaying.send(true);
     }
 }
 
+function delay_play_sound(bool){
+    // Dirty hack to make sure that we do not play the sound before the id is
+    // updated
+    if(bool){
+        setTimeout(play_sound, 200);
+    };
+}
+
 // Subscribe to playSound port
-presti.ports.playSound.subscribe(play_sound);
+presti.ports.playSound.subscribe(delay_play_sound);
 
 // Subscribe to soundId port
 presti.ports.soundId.subscribe(sound.register_sound);
