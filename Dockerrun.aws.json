@@ -1,0 +1,12 @@
+{
+    "AWSEBDockerrunVersion": "1",
+    "Image": {
+        "Name": "sgillis/presti",
+        "Update": "true"
+    },
+    "Ports": [
+        {
+            "ContainerPort": "80"
+        }
+    ]
+}
