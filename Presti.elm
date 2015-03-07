@@ -14,11 +14,13 @@ import Questionnaire
 import Instructions
 import Experiment
 
+
 -- MODEL
 
 type Action = NoOp
             | ScreenUpdate Screens.Update
             | QuestionnaireUpdate Questionnaire.Update
+            | ExperimentUpdate Experiment.Update
             | SliderUpdate Slider.Update
             | SoundUpdate Sound.Update
 
@@ -26,7 +28,6 @@ type alias Model =
     { screen : Screens.Model
     , questions : Questionnaire.Questions
     , instructions : Instructions.Instructions
-    , sliderPosition : Int
     , experiment : Experiment.Experiment
     }
 
@@ -35,7 +36,6 @@ initialModel =
     { screen = Screens.initialScreen
     , questions = Questionnaire.emptyQuestions
     , instructions = Instructions.emptyInstructions
-    , sliderPosition = 50
     , experiment = Experiment.emptyExperiment
     }
 
@@ -44,12 +44,6 @@ getSound model = case Screens.toScreen model.screen of
     Screens.QuestionScreen -> Sound.emptyModel
     Screens.InstructionsScreen -> model.instructions.sound
     Screens.ExperimentScreen -> model.experiment.sound
-
-getSlider : Model -> Slider.Model
-getSlider model = case Screens.toScreen model.screen of
-    Screens.QuestionScreen -> Slider.emptySlider
-    Screens.InstructionsScreen -> model.instructions.slider
-    Screens.ExperimentScreen -> Slider.emptySlider
 
 
 -- UPDATE
@@ -60,6 +54,8 @@ update action model = case action of
     ScreenUpdate u -> { model | screen <- Screens.update u model.screen }
     QuestionnaireUpdate update ->
         { model | questions <- Questionnaire.update update model.questions }
+    ExperimentUpdate update ->
+        { model | experiment <- Experiment.update update model.experiment }
     SliderUpdate update -> updateSlider update model
     SoundUpdate update -> updateSound update model
     _ -> model
@@ -83,21 +79,19 @@ updateSlider u model = case Screens.toScreen model.screen of
         let ins = model.instructions
             newIns = { ins | slider <- Slider.update u ins.slider }
         in { model | instructions <- newIns }
-    Screens.ExperimentScreen ->
-        let exp = model.experiment
-            newExp = { exp | slider <- Slider.update u exp.slider }
-        in { model | experiment <- newExp }
+    Screens.ExperimentScreen -> case u of
+        Slider.DragSlider x ->
+            { model | experiment <- Experiment.update
+                                    (Experiment.SliderUpdate x)
+                                    model.experiment }
+        _ -> model
 
 
 -- VIEW
 
 view : Model -> Html
 view model = case Screens.toScreen model.screen of
-    Screens.QuestionScreen -> div [ class "container" ]
-        [ Questionnaire.questionScreen model.questions
-        , pageBreak
-        , row [ Screens.nextScreenButton ]
-        ]
+    Screens.QuestionScreen -> Questionnaire.view model.questions
     Screens.InstructionsScreen -> Instructions.view model.instructions
     Screens.ExperimentScreen -> Experiment.view model.experiment
     _ -> row [ text "unknown screen" ]
@@ -116,7 +110,9 @@ inputSignal =
     merge (ScreenUpdate <~ subscribe Screens.screenChannel)
  <| merge (QuestionnaireUpdate <~ subscribe Questionnaire.updateChannel)
  <| merge (SliderUpdate <~ (Slider.DragSlider <~ sliderValue))
-          (SoundUpdate <~ (Sound.SoundPlayed <~ donePlaying))
+ <| merge (SoundUpdate <~ (Sound.SoundPlayed <~ donePlaying))
+          (ExperimentUpdate <~ subscribe Experiment.experimentChannel)
+
 
 soundIdSignal : Signal Int
 soundIdSignal = .soundId <~ (getSound <~ model)

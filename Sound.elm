@@ -36,6 +36,9 @@ playSound x model = { model | soundId <- x
 repeatSound : Model -> Model
 repeatSound model = { model | playSound <- True }
 
+setSound : Int -> Model -> Model
+setSound x model = { model | soundId <- x }
+
 
 -- VIEW
 
