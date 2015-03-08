@@ -1768,8 +1768,10 @@ Elm.Experiment.make = function (_elm) {
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
    $Html$Events = Elm.Html.Events.make(_elm),
    $HtmlConstructs = Elm.HtmlConstructs.make(_elm),
+   $List = Elm.List.make(_elm),
    $ListUtils = Elm.ListUtils.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
+   $Screens = Elm.Screens.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Slider = Elm.Slider.make(_elm),
    $Sound = Elm.Sound.make(_elm);
@@ -1784,7 +1786,7 @@ Elm.Experiment.make = function (_elm) {
             case "Nothing":
             return $HtmlConstructs.row(_L.fromArray([$Html.text("You\'re at the end of the experiment")]));}
          _U.badCase($moduleName,
-         "between lines 66 and 68");
+         "between lines 71 and 73");
       }();
    };
    var updateSound = function (exp) {
@@ -1801,7 +1803,7 @@ Elm.Experiment.make = function (_elm) {
               exp);
             case "Nothing": return exp;}
          _U.badCase($moduleName,
-         "between lines 48 and 50");
+         "between lines 56 and 58");
       }();
    };
    var update = F2(function (upd,
@@ -1813,7 +1815,10 @@ Elm.Experiment.make = function (_elm) {
                                            ,exp.i + 1]],
               exp));
             case "NoOp": return exp;
-            case "Previous": return exp;
+            case "Previous":
+            return updateSound(_U.replace([["i"
+                                           ,exp.i - 1]],
+              exp));
             case "Replay":
             return _U.replace([["sound"
                                ,$Sound.repeatSound(exp.sound)]],
@@ -1826,7 +1831,7 @@ Elm.Experiment.make = function (_elm) {
                                upd._0)]],
               exp);}
          _U.badCase($moduleName,
-         "between lines 40 and 45");
+         "between lines 48 and 53");
       }();
    });
    var Replay = {ctor: "Replay"};
@@ -1843,15 +1848,29 @@ Elm.Experiment.make = function (_elm) {
    experimentChannel,
    Next))]),
    _L.fromArray([$Html.text("Volgend fragment")]));
+   var previousButton = A2($Html.button,
+   _L.fromArray([$Html$Events.onClick(A2($Signal.send,
+   experimentChannel,
+   Previous))]),
+   _L.fromArray([$Html.text("Vorig fragment")]));
+   var firstFragment = function (exp) {
+      return _U.eq(exp.i,0);
+   };
+   var lastFragment = function (exp) {
+      return _U.eq(exp.i,
+      $List.length(exp.samples) - 1);
+   };
+   var buttons = function (exp) {
+      return firstFragment(exp) ? $HtmlConstructs.row(_L.fromArray([nextButton])) : lastFragment(exp) ? $HtmlConstructs.row(_L.fromArray([previousButton
+                                                                                                                                         ,$Screens.nextScreenButton])) : $HtmlConstructs.row(_L.fromArray([previousButton
+                                                                                                                                                                                                          ,nextButton]));
+   };
    var view = function (exp) {
       return A2($Html.div,
       _L.fromArray([$Html$Attributes.$class("container")]),
       _L.fromArray([$HtmlConstructs.prestiTitle
                    ,getSlider(exp)
-                   ,$HtmlConstructs.row(_L.fromArray([nextButton]))
-                   ,$HtmlConstructs.row(_L.fromArray([$Html.text($Basics.toString(exp.rates))]))
-                   ,$HtmlConstructs.row(_L.fromArray([$Html.text($Basics.toString(exp.sound))]))
-                   ,$HtmlConstructs.row(_L.fromArray([$Html.text($Basics.toString(exp.i))]))]));
+                   ,buttons(exp)]));
    };
    var emptyExperiment = {_: {}
                          ,i: 0
@@ -1873,6 +1892,8 @@ Elm.Experiment.make = function (_elm) {
    _elm.Experiment.values = {_op: _op
                             ,Experiment: Experiment
                             ,emptyExperiment: emptyExperiment
+                            ,lastFragment: lastFragment
+                            ,firstFragment: firstFragment
                             ,NoOp: NoOp
                             ,SliderUpdate: SliderUpdate
                             ,Next: Next
@@ -1883,6 +1904,8 @@ Elm.Experiment.make = function (_elm) {
                             ,view: view
                             ,getSlider: getSlider
                             ,nextButton: nextButton
+                            ,previousButton: previousButton
+                            ,buttons: buttons
                             ,experimentChannel: experimentChannel};
    return _elm.Experiment.values;
 };
@@ -3743,8 +3766,11 @@ Elm.HtmlConstructs.make = function (_elm) {
    });
    var row = $Html.div(_L.fromArray([$Html$Attributes.$class("row")]));
    var prestiTitle = row(_L.fromArray([A2($Html.h1,
-   _L.fromArray([]),
-   _L.fromArray([$Html.text("PreSti")]))]));
+                                      _L.fromArray([]),
+                                      _L.fromArray([$Html.text("Presti")]))
+                                      ,A2($Html.hr,
+                                      _L.fromArray([]),
+                                      _L.fromArray([]))]));
    var pageBreak = row(_L.fromArray([A2($Html.hr,
    _L.fromArray([]),
    _L.fromArray([]))]));
@@ -10752,6 +10778,8 @@ Elm.Presti.make = function (_elm) {
    $Basics = Elm.Basics.make(_elm),
    $Experiment = Elm.Experiment.make(_elm),
    $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Html$Events = Elm.Html.Events.make(_elm),
    $HtmlConstructs = Elm.HtmlConstructs.make(_elm),
    $Instructions = Elm.Instructions.make(_elm),
    $Questionnaire = Elm.Questionnaire.make(_elm),
@@ -10759,7 +10787,145 @@ Elm.Presti.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $Slider = Elm.Slider.make(_elm),
    $Sound = Elm.Sound.make(_elm),
+   $Subject = Elm.Subject.make(_elm),
    $Time = Elm.Time.make(_elm);
+   var setModel = _P.portIn("setModel",
+   _P.incomingSignal(function (v) {
+      return typeof v === "object" && "screen" in v && "subject" in v && "questions" in v && "instructions" in v && "experiment" in v && "submit" in v && "submitE" in v && "submitted" in v && "username" in v && "password" in v ? {_: {}
+                                                                                                                                                                                                                                     ,screen: typeof v.screen === "string" || typeof v.screen === "object" && v.screen instanceof String ? v.screen : _U.badPort("a string",
+                                                                                                                                                                                                                                     v.screen)
+                                                                                                                                                                                                                                     ,subject: typeof v.subject === "object" && "number" in v.subject ? {_: {}
+                                                                                                                                                                                                                                                                                                        ,number: typeof v.subject.number === "string" || typeof v.subject.number === "object" && v.subject.number instanceof String ? v.subject.number : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                        v.subject.number)} : _U.badPort("an object with fields \'number\'",
+                                                                                                                                                                                                                                     v.subject)
+                                                                                                                                                                                                                                     ,questions: typeof v.questions === "object" && "leeftijd" in v.questions && "geslacht" in v.questions && "vraag1" in v.questions && "opmerking1" in v.questions && "vraag2" in v.questions && "opmerking2" in v.questions && "vraag3" in v.questions && "opmerking3" in v.questions && "vraag4" in v.questions && "opmerking4" in v.questions && "vraag5" in v.questions && "opmerking5" in v.questions && "vraag6" in v.questions && "opmerking6" in v.questions && "vraag7" in v.questions && "opmerking7" in v.questions && "vraag8" in v.questions && "opmerking8" in v.questions && "vraag9" in v.questions && "opmerking9" in v.questions && "vraag10" in v.questions && "opmerking10" in v.questions && "vraag11" in v.questions && "errors" in v.questions ? {_: {}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ,leeftijd: typeof v.questions.leeftijd === "string" || typeof v.questions.leeftijd === "object" && v.questions.leeftijd instanceof String ? v.questions.leeftijd : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          v.questions.leeftijd)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ,geslacht: typeof v.questions.geslacht === "string" || typeof v.questions.geslacht === "object" && v.questions.geslacht instanceof String ? v.questions.geslacht : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          v.questions.geslacht)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ,vraag1: typeof v.questions.vraag1 === "string" || typeof v.questions.vraag1 === "object" && v.questions.vraag1 instanceof String ? v.questions.vraag1 : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          v.questions.vraag1)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ,opmerking1: typeof v.questions.opmerking1 === "string" || typeof v.questions.opmerking1 === "object" && v.questions.opmerking1 instanceof String ? v.questions.opmerking1 : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          v.questions.opmerking1)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ,vraag2: typeof v.questions.vraag2 === "string" || typeof v.questions.vraag2 === "object" && v.questions.vraag2 instanceof String ? v.questions.vraag2 : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          v.questions.vraag2)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ,opmerking2: typeof v.questions.opmerking2 === "string" || typeof v.questions.opmerking2 === "object" && v.questions.opmerking2 instanceof String ? v.questions.opmerking2 : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          v.questions.opmerking2)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ,vraag3: typeof v.questions.vraag3 === "string" || typeof v.questions.vraag3 === "object" && v.questions.vraag3 instanceof String ? v.questions.vraag3 : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          v.questions.vraag3)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ,opmerking3: typeof v.questions.opmerking3 === "string" || typeof v.questions.opmerking3 === "object" && v.questions.opmerking3 instanceof String ? v.questions.opmerking3 : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          v.questions.opmerking3)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ,vraag4: typeof v.questions.vraag4 === "string" || typeof v.questions.vraag4 === "object" && v.questions.vraag4 instanceof String ? v.questions.vraag4 : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          v.questions.vraag4)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ,opmerking4: typeof v.questions.opmerking4 === "string" || typeof v.questions.opmerking4 === "object" && v.questions.opmerking4 instanceof String ? v.questions.opmerking4 : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          v.questions.opmerking4)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ,vraag5: typeof v.questions.vraag5 === "string" || typeof v.questions.vraag5 === "object" && v.questions.vraag5 instanceof String ? v.questions.vraag5 : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          v.questions.vraag5)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ,opmerking5: typeof v.questions.opmerking5 === "string" || typeof v.questions.opmerking5 === "object" && v.questions.opmerking5 instanceof String ? v.questions.opmerking5 : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          v.questions.opmerking5)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ,vraag6: typeof v.questions.vraag6 === "string" || typeof v.questions.vraag6 === "object" && v.questions.vraag6 instanceof String ? v.questions.vraag6 : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          v.questions.vraag6)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ,opmerking6: typeof v.questions.opmerking6 === "string" || typeof v.questions.opmerking6 === "object" && v.questions.opmerking6 instanceof String ? v.questions.opmerking6 : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          v.questions.opmerking6)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ,vraag7: typeof v.questions.vraag7 === "string" || typeof v.questions.vraag7 === "object" && v.questions.vraag7 instanceof String ? v.questions.vraag7 : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          v.questions.vraag7)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ,opmerking7: typeof v.questions.opmerking7 === "string" || typeof v.questions.opmerking7 === "object" && v.questions.opmerking7 instanceof String ? v.questions.opmerking7 : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          v.questions.opmerking7)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ,vraag8: typeof v.questions.vraag8 === "string" || typeof v.questions.vraag8 === "object" && v.questions.vraag8 instanceof String ? v.questions.vraag8 : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          v.questions.vraag8)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ,opmerking8: typeof v.questions.opmerking8 === "string" || typeof v.questions.opmerking8 === "object" && v.questions.opmerking8 instanceof String ? v.questions.opmerking8 : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          v.questions.opmerking8)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ,vraag9: typeof v.questions.vraag9 === "string" || typeof v.questions.vraag9 === "object" && v.questions.vraag9 instanceof String ? v.questions.vraag9 : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          v.questions.vraag9)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ,opmerking9: typeof v.questions.opmerking9 === "string" || typeof v.questions.opmerking9 === "object" && v.questions.opmerking9 instanceof String ? v.questions.opmerking9 : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          v.questions.opmerking9)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ,vraag10: typeof v.questions.vraag10 === "string" || typeof v.questions.vraag10 === "object" && v.questions.vraag10 instanceof String ? v.questions.vraag10 : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          v.questions.vraag10)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ,opmerking10: typeof v.questions.opmerking10 === "string" || typeof v.questions.opmerking10 === "object" && v.questions.opmerking10 instanceof String ? v.questions.opmerking10 : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          v.questions.opmerking10)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ,vraag11: typeof v.questions.vraag11 === "string" || typeof v.questions.vraag11 === "object" && v.questions.vraag11 instanceof String ? v.questions.vraag11 : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          v.questions.vraag11)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ,errors: typeof v.questions.errors === "object" && "leeftijd" in v.questions.errors && "geslacht" in v.questions.errors && "vraag1" in v.questions.errors && "vraag2" in v.questions.errors && "vraag3" in v.questions.errors && "vraag4" in v.questions.errors && "vraag5" in v.questions.errors && "vraag6" in v.questions.errors && "vraag7" in v.questions.errors && "vraag8" in v.questions.errors && "vraag9" in v.questions.errors && "vraag10" in v.questions.errors && "vraag11" in v.questions.errors ? {_: {}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ,leeftijd: typeof v.questions.errors.leeftijd === "boolean" ? v.questions.errors.leeftijd : _U.badPort("a boolean (true or false)",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            v.questions.errors.leeftijd)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ,geslacht: typeof v.questions.errors.geslacht === "boolean" ? v.questions.errors.geslacht : _U.badPort("a boolean (true or false)",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            v.questions.errors.geslacht)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ,vraag1: typeof v.questions.errors.vraag1 === "boolean" ? v.questions.errors.vraag1 : _U.badPort("a boolean (true or false)",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            v.questions.errors.vraag1)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ,vraag2: typeof v.questions.errors.vraag2 === "boolean" ? v.questions.errors.vraag2 : _U.badPort("a boolean (true or false)",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            v.questions.errors.vraag2)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ,vraag3: typeof v.questions.errors.vraag3 === "boolean" ? v.questions.errors.vraag3 : _U.badPort("a boolean (true or false)",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            v.questions.errors.vraag3)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ,vraag4: typeof v.questions.errors.vraag4 === "boolean" ? v.questions.errors.vraag4 : _U.badPort("a boolean (true or false)",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            v.questions.errors.vraag4)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ,vraag5: typeof v.questions.errors.vraag5 === "boolean" ? v.questions.errors.vraag5 : _U.badPort("a boolean (true or false)",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            v.questions.errors.vraag5)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ,vraag6: typeof v.questions.errors.vraag6 === "boolean" ? v.questions.errors.vraag6 : _U.badPort("a boolean (true or false)",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            v.questions.errors.vraag6)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ,vraag7: typeof v.questions.errors.vraag7 === "boolean" ? v.questions.errors.vraag7 : _U.badPort("a boolean (true or false)",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            v.questions.errors.vraag7)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ,vraag8: typeof v.questions.errors.vraag8 === "boolean" ? v.questions.errors.vraag8 : _U.badPort("a boolean (true or false)",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            v.questions.errors.vraag8)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ,vraag9: typeof v.questions.errors.vraag9 === "boolean" ? v.questions.errors.vraag9 : _U.badPort("a boolean (true or false)",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            v.questions.errors.vraag9)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ,vraag10: typeof v.questions.errors.vraag10 === "boolean" ? v.questions.errors.vraag10 : _U.badPort("a boolean (true or false)",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            v.questions.errors.vraag10)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ,vraag11: typeof v.questions.errors.vraag11 === "boolean" ? v.questions.errors.vraag11 : _U.badPort("a boolean (true or false)",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            v.questions.errors.vraag11)} : _U.badPort("an object with fields \'leeftijd\', \'geslacht\', \'vraag1\', \'vraag2\', \'vraag3\', \'vraag4\', \'vraag5\', \'vraag6\', \'vraag7\', \'vraag8\', \'vraag9\', \'vraag10\', \'vraag11\'",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          v.questions.errors)} : _U.badPort("an object with fields \'leeftijd\', \'geslacht\', \'vraag1\', \'opmerking1\', \'vraag2\', \'opmerking2\', \'vraag3\', \'opmerking3\', \'vraag4\', \'opmerking4\', \'vraag5\', \'opmerking5\', \'vraag6\', \'opmerking6\', \'vraag7\', \'opmerking7\', \'vraag8\', \'opmerking8\', \'vraag9\', \'opmerking9\', \'vraag10\', \'opmerking10\', \'vraag11\', \'errors\'",
+                                                                                                                                                                                                                                     v.questions)
+                                                                                                                                                                                                                                     ,instructions: typeof v.instructions === "object" && "sound" in v.instructions && "slider" in v.instructions ? {_: {}
+                                                                                                                                                                                                                                                                                                                                                    ,sound: typeof v.instructions.sound === "object" && "soundId" in v.instructions.sound && "playSound" in v.instructions.sound ? {_: {}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   ,soundId: typeof v.instructions.sound.soundId === "number" ? v.instructions.sound.soundId : _U.badPort("a number",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   v.instructions.sound.soundId)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   ,playSound: typeof v.instructions.sound.playSound === "boolean" ? v.instructions.sound.playSound : _U.badPort("a boolean (true or false)",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   v.instructions.sound.playSound)} : _U.badPort("an object with fields \'soundId\', \'playSound\'",
+                                                                                                                                                                                                                                                                                                                                                    v.instructions.sound)
+                                                                                                                                                                                                                                                                                                                                                    ,slider: typeof v.instructions.slider === "number" ? v.instructions.slider : _U.badPort("a number",
+                                                                                                                                                                                                                                                                                                                                                    v.instructions.slider)} : _U.badPort("an object with fields \'sound\', \'slider\'",
+                                                                                                                                                                                                                                     v.instructions)
+                                                                                                                                                                                                                                     ,experiment: typeof v.experiment === "object" && "samples" in v.experiment && "rates" in v.experiment && "sound" in v.experiment && "i" in v.experiment ? {_: {}
+                                                                                                                                                                                                                                                                                                                                                                                               ,samples: typeof v.experiment.samples === "object" && v.experiment.samples instanceof Array ? Elm.Native.List.make(_elm).fromArray(v.experiment.samples.map(function (v) {
+                                                                                                                                                                                                                                                                                                                                                                                                  return typeof v === "number" ? v : _U.badPort("a number",
+                                                                                                                                                                                                                                                                                                                                                                                                  v);
+                                                                                                                                                                                                                                                                                                                                                                                               })) : _U.badPort("an array",
+                                                                                                                                                                                                                                                                                                                                                                                               v.experiment.samples)
+                                                                                                                                                                                                                                                                                                                                                                                               ,rates: typeof v.experiment.rates === "object" && v.experiment.rates instanceof Array ? Elm.Native.List.make(_elm).fromArray(v.experiment.rates.map(function (v) {
+                                                                                                                                                                                                                                                                                                                                                                                                  return typeof v === "number" ? v : _U.badPort("a number",
+                                                                                                                                                                                                                                                                                                                                                                                                  v);
+                                                                                                                                                                                                                                                                                                                                                                                               })) : _U.badPort("an array",
+                                                                                                                                                                                                                                                                                                                                                                                               v.experiment.rates)
+                                                                                                                                                                                                                                                                                                                                                                                               ,sound: typeof v.experiment.sound === "object" && "soundId" in v.experiment.sound && "playSound" in v.experiment.sound ? {_: {}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ,soundId: typeof v.experiment.sound.soundId === "number" ? v.experiment.sound.soundId : _U.badPort("a number",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        v.experiment.sound.soundId)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ,playSound: typeof v.experiment.sound.playSound === "boolean" ? v.experiment.sound.playSound : _U.badPort("a boolean (true or false)",
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        v.experiment.sound.playSound)} : _U.badPort("an object with fields \'soundId\', \'playSound\'",
+                                                                                                                                                                                                                                                                                                                                                                                               v.experiment.sound)
+                                                                                                                                                                                                                                                                                                                                                                                               ,i: typeof v.experiment.i === "number" ? v.experiment.i : _U.badPort("a number",
+                                                                                                                                                                                                                                                                                                                                                                                               v.experiment.i)} : _U.badPort("an object with fields \'samples\', \'rates\', \'sound\', \'i\'",
+                                                                                                                                                                                                                                     v.experiment)
+                                                                                                                                                                                                                                     ,submit: typeof v.submit === "boolean" ? v.submit : _U.badPort("a boolean (true or false)",
+                                                                                                                                                                                                                                     v.submit)
+                                                                                                                                                                                                                                     ,submitE: typeof v.submitE === "boolean" ? v.submitE : _U.badPort("a boolean (true or false)",
+                                                                                                                                                                                                                                     v.submitE)
+                                                                                                                                                                                                                                     ,submitted: typeof v.submitted === "boolean" ? v.submitted : _U.badPort("a boolean (true or false)",
+                                                                                                                                                                                                                                     v.submitted)
+                                                                                                                                                                                                                                     ,username: typeof v.username === "string" || typeof v.username === "object" && v.username instanceof String ? v.username : _U.badPort("a string",
+                                                                                                                                                                                                                                     v.username)
+                                                                                                                                                                                                                                     ,password: typeof v.password === "string" || typeof v.password === "object" && v.password instanceof String ? v.password : _U.badPort("a string",
+                                                                                                                                                                                                                                     v.password)} : _U.badPort("an object with fields \'screen\', \'subject\', \'questions\', \'instructions\', \'experiment\', \'submit\', \'submitE\', \'submitted\', \'username\', \'password\'",
+      v);
+   }));
+   var submitError = _P.portIn("submitError",
+   _P.incomingSignal(function (v) {
+      return typeof v === "boolean" ? v : _U.badPort("a boolean (true or false)",
+      v);
+   }));
+   var modelSent = _P.portIn("modelSent",
+   _P.incomingSignal(function (v) {
+      return typeof v === "boolean" ? v : _U.badPort("a boolean (true or false)",
+      v);
+   }));
    var sliderValue = _P.portIn("sliderValue",
    _P.incomingSignal(function (v) {
       return typeof v === "number" ? v : _U.badPort("a number",
@@ -10775,24 +10941,16 @@ Elm.Presti.make = function (_elm) {
       return typeof v === "boolean" ? v : _U.badPort("a boolean (true or false)",
       v);
    }));
-   var view = function (model) {
-      return function () {
-         var _v0 = $Screens.toScreen(model.screen);
-         switch (_v0.ctor)
-         {case "ExperimentScreen":
-            return $Experiment.view(model.experiment);
-            case "InstructionsScreen":
-            return $Instructions.view(model.instructions);
-            case "QuestionScreen":
-            return $Questionnaire.view(model.questions);}
-         return $HtmlConstructs.row(_L.fromArray([$Html.text("unknown screen")]));
-      }();
+   var submissionComplete = function (model) {
+      return model.submitE ? $HtmlConstructs.row(_L.fromArray([$Html.text("\nEr ging iets mis bij het doorsturen. Kopieer onderstaande data naar de harde\nschijf en contacteer de administrator\n")
+                                                              ,$HtmlConstructs.pageBreak
+                                                              ,$Html.text($Basics.toString(model))])) : $HtmlConstructs.row(_L.fromArray([$Html.text("Data is doorgestuurd")]));
    };
    var updateSlider = F2(function (u,
    model) {
       return function () {
-         var _v1 = $Screens.toScreen(model.screen);
-         switch (_v1.ctor)
+         var _v0 = $Screens.toScreen(model.screen);
+         switch (_v0.ctor)
          {case "ExperimentScreen":
             return function () {
                  switch (u.ctor)
@@ -10818,15 +10976,14 @@ Elm.Presti.make = function (_elm) {
               }();
             case "QuestionScreen":
             return model;}
-         _U.badCase($moduleName,
-         "between lines 76 and 87");
+         return model;
       }();
    });
    var updateSound = F2(function (u,
    model) {
       return function () {
-         var _v4 = $Screens.toScreen(model.screen);
-         switch (_v4.ctor)
+         var _v3 = $Screens.toScreen(model.screen);
+         switch (_v3.ctor)
          {case "ExperimentScreen":
             return function () {
                  var exp = model.experiment;
@@ -10853,8 +11010,7 @@ Elm.Presti.make = function (_elm) {
               }();
             case "QuestionScreen":
             return model;}
-         _U.badCase($moduleName,
-         "between lines 64 and 73");
+         return model;
       }();
    });
    var update = F2(function (action,
@@ -10867,7 +11023,20 @@ Elm.Presti.make = function (_elm) {
                                action._0,
                                model.experiment)]],
               model);
+            case "ModelSent":
+            switch (action._0)
+              {case true:
+                 return _U.replace([["submit"
+                                    ,false]
+                                   ,["submitted",true]
+                                   ,["password",""]],
+                   model);}
+              break;
             case "NoOp": return model;
+            case "Password":
+            return _U.replace([["password"
+                               ,action._0]],
+              model);
             case "QuestionnaireUpdate":
             return _U.replace([["questions"
                                ,A2($Questionnaire.update,
@@ -10880,6 +11049,8 @@ Elm.Presti.make = function (_elm) {
                                action._0,
                                model.screen)]],
               model);
+            case "SetModel":
+            return action._0;
             case "SliderUpdate":
             return A2(updateSlider,
               action._0,
@@ -10887,39 +11058,102 @@ Elm.Presti.make = function (_elm) {
             case "SoundUpdate":
             return A2(updateSound,
               action._0,
+              model);
+            case "SubjectUpdate":
+            return _U.replace([["subject"
+                               ,A2($Subject.update,
+                               action._0,
+                               model.subject)]],
+              model);
+            case "Submit":
+            return _U.replace([["submit"
+                               ,true]],
+              model);
+            case "SubmitError":
+            return _U.replace([["submitE"
+                               ,action._0]],
+              model);
+            case "Username":
+            return _U.replace([["username"
+                               ,action._0]],
               model);}
          return model;
       }();
    });
    var getSound = function (model) {
       return function () {
-         var _v11 = $Screens.toScreen(model.screen);
-         switch (_v11.ctor)
+         var _v16 = $Screens.toScreen(model.screen);
+         switch (_v16.ctor)
          {case "ExperimentScreen":
             return model.experiment.sound;
             case "InstructionsScreen":
-            return model.instructions.sound;
-            case "QuestionScreen":
-            return $Sound.emptyModel;}
-         _U.badCase($moduleName,
-         "between lines 43 and 46");
+            return model.instructions.sound;}
+         return $Sound.emptyModel;
       }();
    };
    var initialModel = {_: {}
                       ,experiment: $Experiment.emptyExperiment
                       ,instructions: $Instructions.emptyInstructions
+                      ,password: ""
                       ,questions: $Questionnaire.emptyQuestions
-                      ,screen: $Screens.initialScreen};
-   var Model = F4(function (a,
-   b,
-   c,
-   d) {
-      return {_: {}
-             ,experiment: d
-             ,instructions: c
-             ,questions: b
-             ,screen: a};
-   });
+                      ,screen: $Screens.initialScreen
+                      ,subject: $Subject.emptySubject
+                      ,submit: false
+                      ,submitE: false
+                      ,submitted: false
+                      ,username: ""};
+   var Model = function (a) {
+      return function (b) {
+         return function (c) {
+            return function (d) {
+               return function (e) {
+                  return function (f) {
+                     return function (g) {
+                        return function (h) {
+                           return function (i) {
+                              return function (j) {
+                                 return {_: {}
+                                        ,experiment: e
+                                        ,instructions: d
+                                        ,password: j
+                                        ,questions: c
+                                        ,screen: a
+                                        ,subject: b
+                                        ,submit: f
+                                        ,submitE: g
+                                        ,submitted: h
+                                        ,username: i};
+                              };
+                           };
+                        };
+                     };
+                  };
+               };
+            };
+         };
+      };
+   };
+   var SetModel = function (a) {
+      return {ctor: "SetModel"
+             ,_0: a};
+   };
+   var Password = function (a) {
+      return {ctor: "Password"
+             ,_0: a};
+   };
+   var Username = function (a) {
+      return {ctor: "Username"
+             ,_0: a};
+   };
+   var SubmitError = function (a) {
+      return {ctor: "SubmitError"
+             ,_0: a};
+   };
+   var ModelSent = function (a) {
+      return {ctor: "ModelSent"
+             ,_0: a};
+   };
+   var Submit = {ctor: "Submit"};
    var SoundUpdate = function (a) {
       return {ctor: "SoundUpdate"
              ,_0: a};
@@ -10936,27 +11170,113 @@ Elm.Presti.make = function (_elm) {
       return {ctor: "QuestionnaireUpdate"
              ,_0: a};
    };
+   var SubjectUpdate = function (a) {
+      return {ctor: "SubjectUpdate"
+             ,_0: a};
+   };
    var ScreenUpdate = function (a) {
       return {ctor: "ScreenUpdate"
              ,_0: a};
    };
-   var inputSignal = $Signal.merge(A2($Signal._op["<~"],
+   var NoOp = {ctor: "NoOp"};
+   var actionChannel = $Signal.channel(NoOp);
+   var usernameField = function (val) {
+      return $HtmlConstructs.row(_L.fromArray([A2($HtmlConstructs.column,
+                                              3,
+                                              _L.fromArray([$Html.text("Username")]))
+                                              ,A2($HtmlConstructs.column,
+                                              9,
+                                              _L.fromArray([A2($Html.input,
+                                              _L.fromArray([$Html$Attributes.value(val)
+                                                           ,$Html$Attributes.type$("text")
+                                                           ,A3($Html$Events.on,
+                                                           "input",
+                                                           $Html$Events.targetValue,
+                                                           function ($) {
+                                                              return $Signal.send(actionChannel)(Username($));
+                                                           })
+                                                           ,$Html$Attributes.style(_L.fromArray([{ctor: "_Tuple2"
+                                                                                                 ,_0: "width"
+                                                                                                 ,_1: "200px"}]))]),
+                                              _L.fromArray([]))]))]));
+   };
+   var passwordField = function (val) {
+      return $HtmlConstructs.row(_L.fromArray([A2($HtmlConstructs.column,
+                                              3,
+                                              _L.fromArray([$Html.text("Password")]))
+                                              ,A2($HtmlConstructs.column,
+                                              9,
+                                              _L.fromArray([A2($Html.input,
+                                              _L.fromArray([$Html$Attributes.value(val)
+                                                           ,$Html$Attributes.type$("password")
+                                                           ,A3($Html$Events.on,
+                                                           "input",
+                                                           $Html$Events.targetValue,
+                                                           function ($) {
+                                                              return $Signal.send(actionChannel)(Password($));
+                                                           })
+                                                           ,$Html$Attributes.style(_L.fromArray([{ctor: "_Tuple2"
+                                                                                                 ,_0: "width"
+                                                                                                 ,_1: "200px"}]))]),
+                                              _L.fromArray([]))]))]));
+   };
+   var submitView = function (model) {
+      return A2($Html.div,
+      _L.fromArray([$Html$Attributes.$class("container")]),
+      _L.fromArray([$HtmlConstructs.prestiTitle
+                   ,usernameField(model.username)
+                   ,passwordField(model.password)
+                   ,$HtmlConstructs.row(_L.fromArray([A2($Html.button,
+                   _L.fromArray([$Html$Events.onClick(A2($Signal.send,
+                   actionChannel,
+                   Submit))]),
+                   _L.fromArray([$Html.text("Submit data")]))]))
+                   ,model.submitted ? submissionComplete(model) : A2($Html.div,
+                   _L.fromArray([]),
+                   _L.fromArray([]))]));
+   };
+   var view = function (model) {
+      return function () {
+         var _v17 = $Screens.toScreen(model.screen);
+         switch (_v17.ctor)
+         {case "ExperimentScreen":
+            return $Experiment.view(model.experiment);
+            case "InstructionsScreen":
+            return $Instructions.view(model.instructions);
+            case "QuestionScreen":
+            return $Questionnaire.view(model.questions);
+            case "SubjectScreen":
+            return $Subject.view(model.subject);
+            case "SubmitScreen":
+            return submitView(model);}
+         return $HtmlConstructs.row(_L.fromArray([$Html.text("unknown screen")]));
+      }();
+   };
+   var inputSignal = $Signal.merge($Signal.subscribe(actionChannel))($Signal.merge(A2($Signal._op["<~"],
    ScreenUpdate,
    $Signal.subscribe($Screens.screenChannel)))($Signal.merge(A2($Signal._op["<~"],
+   SubjectUpdate,
+   $Signal.subscribe($Subject.updateChannel)))($Signal.merge(A2($Signal._op["<~"],
    QuestionnaireUpdate,
    $Signal.subscribe($Questionnaire.updateChannel)))($Signal.merge(A2($Signal._op["<~"],
    SliderUpdate,
    A2($Signal._op["<~"],
    $Slider.DragSlider,
-   sliderValue)))(A2($Signal.merge,
-   A2($Signal._op["<~"],
+   sliderValue)))($Signal.merge(A2($Signal._op["<~"],
    SoundUpdate,
    A2($Signal._op["<~"],
    $Sound.SoundPlayed,
-   donePlaying)),
-   A2($Signal._op["<~"],
+   donePlaying)))($Signal.merge(A2($Signal._op["<~"],
    ExperimentUpdate,
-   $Signal.subscribe($Experiment.experimentChannel))))));
+   $Signal.subscribe($Experiment.experimentChannel)))($Signal.merge(A2($Signal._op["<~"],
+   ModelSent,
+   modelSent))(A2($Signal.merge,
+   A2($Signal._op["<~"],
+   SubmitError,
+   submitError),
+   A2($Signal._op["<~"],
+   SetModel,
+   setModel))))))))));
    var model = A3($Signal.foldp,
    update,
    initialModel,
@@ -10990,14 +11310,79 @@ Elm.Presti.make = function (_elm) {
       return v;
    }),
    playSoundSignal);
-   var NoOp = {ctor: "NoOp"};
+   var elmModel = _P.portOut("elmModel",
+   _P.outgoingSignal(function (v) {
+      return {screen: v.screen
+             ,subject: {number: v.subject.number}
+             ,questions: {leeftijd: v.questions.leeftijd
+                         ,geslacht: v.questions.geslacht
+                         ,vraag1: v.questions.vraag1
+                         ,opmerking1: v.questions.opmerking1
+                         ,vraag2: v.questions.vraag2
+                         ,opmerking2: v.questions.opmerking2
+                         ,vraag3: v.questions.vraag3
+                         ,opmerking3: v.questions.opmerking3
+                         ,vraag4: v.questions.vraag4
+                         ,opmerking4: v.questions.opmerking4
+                         ,vraag5: v.questions.vraag5
+                         ,opmerking5: v.questions.opmerking5
+                         ,vraag6: v.questions.vraag6
+                         ,opmerking6: v.questions.opmerking6
+                         ,vraag7: v.questions.vraag7
+                         ,opmerking7: v.questions.opmerking7
+                         ,vraag8: v.questions.vraag8
+                         ,opmerking8: v.questions.opmerking8
+                         ,vraag9: v.questions.vraag9
+                         ,opmerking9: v.questions.opmerking9
+                         ,vraag10: v.questions.vraag10
+                         ,opmerking10: v.questions.opmerking10
+                         ,vraag11: v.questions.vraag11
+                         ,errors: {leeftijd: v.questions.errors.leeftijd
+                                  ,geslacht: v.questions.errors.geslacht
+                                  ,vraag1: v.questions.errors.vraag1
+                                  ,vraag2: v.questions.errors.vraag2
+                                  ,vraag3: v.questions.errors.vraag3
+                                  ,vraag4: v.questions.errors.vraag4
+                                  ,vraag5: v.questions.errors.vraag5
+                                  ,vraag6: v.questions.errors.vraag6
+                                  ,vraag7: v.questions.errors.vraag7
+                                  ,vraag8: v.questions.errors.vraag8
+                                  ,vraag9: v.questions.errors.vraag9
+                                  ,vraag10: v.questions.errors.vraag10
+                                  ,vraag11: v.questions.errors.vraag11}}
+             ,instructions: {sound: {soundId: v.instructions.sound.soundId
+                                    ,playSound: v.instructions.sound.playSound}
+                            ,slider: v.instructions.slider}
+             ,experiment: {samples: Elm.Native.List.make(_elm).toArray(v.experiment.samples).map(function (v) {
+                             return v;
+                          })
+                          ,rates: Elm.Native.List.make(_elm).toArray(v.experiment.rates).map(function (v) {
+                             return v;
+                          })
+                          ,sound: {soundId: v.experiment.sound.soundId
+                                  ,playSound: v.experiment.sound.playSound}
+                          ,i: v.experiment.i}
+             ,submit: v.submit
+             ,submitE: v.submitE
+             ,submitted: v.submitted
+             ,username: v.username
+             ,password: v.password};
+   }),
+   model);
    _elm.Presti.values = {_op: _op
                         ,NoOp: NoOp
                         ,ScreenUpdate: ScreenUpdate
+                        ,SubjectUpdate: SubjectUpdate
                         ,QuestionnaireUpdate: QuestionnaireUpdate
                         ,ExperimentUpdate: ExperimentUpdate
                         ,SliderUpdate: SliderUpdate
                         ,SoundUpdate: SoundUpdate
+                        ,Submit: Submit
+                        ,ModelSent: ModelSent
+                        ,SubmitError: SubmitError
+                        ,Username: Username
+                        ,Password: Password
+                        ,SetModel: SetModel
                         ,Model: Model
                         ,initialModel: initialModel
                         ,getSound: getSound
@@ -11005,11 +11390,16 @@ Elm.Presti.make = function (_elm) {
                         ,updateSound: updateSound
                         ,updateSlider: updateSlider
                         ,view: view
+                        ,submitView: submitView
+                        ,submissionComplete: submissionComplete
+                        ,usernameField: usernameField
+                        ,passwordField: passwordField
                         ,main: main
                         ,model: model
                         ,inputSignal: inputSignal
                         ,soundIdSignal: soundIdSignal
-                        ,playSoundSignal: playSoundSignal};
+                        ,playSoundSignal: playSoundSignal
+                        ,actionChannel: actionChannel};
    return _elm.Presti.values;
 };
 Elm.Questionnaire = Elm.Questionnaire || {};
@@ -11149,6 +11539,7 @@ Elm.Questionnaire.make = function (_elm) {
                                               6,
                                               _L.fromArray([A2($Html.input,
                                               _L.fromArray([$Html$Attributes.value(val)
+                                                           ,$Html$Attributes.type$("text")
                                                            ,A3($Html$Events.on,
                                                            "input",
                                                            $Html$Events.targetValue,
@@ -11201,7 +11592,7 @@ Elm.Questionnaire.make = function (_elm) {
                            _L.fromArray([]))
                            ,$Html.text(_v0._1)]));}
          _U.badCase($moduleName,
-         "between lines 309 and 315");
+         "between lines 308 and 314");
       }();
    });
    var selectionField = F6(function (options,
@@ -11225,10 +11616,6 @@ Elm.Questionnaire.make = function (_elm) {
       return A2($Html.div,
       _L.fromArray([$Html$Attributes.$class("questions")]),
       _L.fromArray([$HtmlConstructs.prestiTitle
-                   ,$HtmlConstructs.row(_L.fromArray([$Html.text("Welcome to PreSti!")]))
-                   ,$HtmlConstructs.row(_L.fromArray([A2($Html.hr,
-                   _L.fromArray([]),
-                   _L.fromArray([]))]))
                    ,A4(inputField,
                    q.errors.leeftijd,
                    "Leeftijd",
@@ -12064,9 +12451,13 @@ Elm.Screens.make = function (_elm) {
             case "InstructionsScreen":
             return "InstructionsScreen";
             case "QuestionScreen":
-            return "QuestionScreen";}
+            return "QuestionScreen";
+            case "SubjectScreen":
+            return "SubjectScreen";
+            case "SubmitScreen":
+            return "SubmitScreen";}
          _U.badCase($moduleName,
-         "between lines 24 and 27");
+         "between lines 25 and 30");
       }();
    };
    var NextScreen = {ctor: "NextScreen"};
@@ -12082,10 +12473,12 @@ Elm.Screens.make = function (_elm) {
    screenChannel,
    PreviousScreen))]),
    _L.fromArray([$Html.text("Vorige scherm")]));
+   var SubmitScreen = {ctor: "SubmitScreen"};
    var ExperimentScreen = {ctor: "ExperimentScreen"};
    var InstructionsScreen = {ctor: "InstructionsScreen"};
    var QuestionScreen = {ctor: "QuestionScreen"};
-   var initialScreen = fromScreen(QuestionScreen);
+   var SubjectScreen = {ctor: "SubjectScreen"};
+   var initialScreen = fromScreen(SubjectScreen);
    var toScreen = function (s) {
       return function () {
          switch (s)
@@ -12094,7 +12487,11 @@ Elm.Screens.make = function (_elm) {
             case "InstructionsScreen":
             return InstructionsScreen;
             case "QuestionScreen":
-            return QuestionScreen;}
+            return QuestionScreen;
+            case "SubjectScreen":
+            return SubjectScreen;
+            case "SubmitScreen":
+            return SubmitScreen;}
          return QuestionScreen;
       }();
    };
@@ -12103,13 +12500,16 @@ Elm.Screens.make = function (_elm) {
          var _v2 = toScreen(model);
          switch (_v2.ctor)
          {case "ExperimentScreen":
-            return fromScreen(ExperimentScreen);
+            return fromScreen(SubmitScreen);
             case "InstructionsScreen":
             return fromScreen(ExperimentScreen);
             case "QuestionScreen":
-            return fromScreen(InstructionsScreen);}
-         _U.badCase($moduleName,
-         "between lines 51 and 54");
+            return fromScreen(InstructionsScreen);
+            case "SubjectScreen":
+            return fromScreen(QuestionScreen);
+            case "SubmitScreen":
+            return fromScreen(SubmitScreen);}
+         return fromScreen(QuestionScreen);
       }();
    };
    var previousScreen = function (model) {
@@ -12121,9 +12521,12 @@ Elm.Screens.make = function (_elm) {
             case "InstructionsScreen":
             return fromScreen(QuestionScreen);
             case "QuestionScreen":
-            return fromScreen(QuestionScreen);}
-         _U.badCase($moduleName,
-         "between lines 45 and 48");
+            return fromScreen(SubjectScreen);
+            case "SubjectScreen":
+            return fromScreen(SubjectScreen);
+            case "SubmitScreen":
+            return fromScreen(ExperimentScreen);}
+         return fromScreen(QuestionScreen);
       }();
    };
    var update = F2(function (u,
@@ -12135,13 +12538,15 @@ Elm.Screens.make = function (_elm) {
             case "PreviousScreen":
             return previousScreen(model);}
          _U.badCase($moduleName,
-         "between lines 40 and 42");
+         "between lines 45 and 47");
       }();
    });
    _elm.Screens.values = {_op: _op
+                         ,SubjectScreen: SubjectScreen
                          ,QuestionScreen: QuestionScreen
                          ,InstructionsScreen: InstructionsScreen
                          ,ExperimentScreen: ExperimentScreen
+                         ,SubmitScreen: SubmitScreen
                          ,PreviousScreen: PreviousScreen
                          ,NextScreen: NextScreen
                          ,initialScreen: initialScreen
@@ -12524,6 +12929,87 @@ Elm.String.make = function (_elm) {
                         ,toList: toList
                         ,fromList: fromList};
    return _elm.String.values;
+};
+Elm.Subject = Elm.Subject || {};
+Elm.Subject.make = function (_elm) {
+   "use strict";
+   _elm.Subject = _elm.Subject || {};
+   if (_elm.Subject.values)
+   return _elm.Subject.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   _P = _N.Ports.make(_elm),
+   $moduleName = "Subject",
+   $Basics = Elm.Basics.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Html$Events = Elm.Html.Events.make(_elm),
+   $HtmlConstructs = Elm.HtmlConstructs.make(_elm),
+   $Screens = Elm.Screens.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var update = F2(function (upd,
+   subj) {
+      return function () {
+         switch (upd.ctor)
+         {case "NoOp": return subj;
+            case "Number":
+            return _U.replace([["number"
+                               ,upd._0]],
+              subj);}
+         _U.badCase($moduleName,
+         "between lines 25 and 27");
+      }();
+   });
+   var emptySubject = {_: {}
+                      ,number: ""};
+   var Number = function (a) {
+      return {ctor: "Number"
+             ,_0: a};
+   };
+   var NoOp = {ctor: "NoOp"};
+   var updateChannel = $Signal.channel(NoOp);
+   var subjectField = function (val) {
+      return $HtmlConstructs.row(_L.fromArray([A2($HtmlConstructs.column,
+                                              3,
+                                              _L.fromArray([$Html.text("Subject ID")]))
+                                              ,A2($HtmlConstructs.column,
+                                              9,
+                                              _L.fromArray([A2($Html.input,
+                                              _L.fromArray([$Html$Attributes.value(val)
+                                                           ,$Html$Attributes.type$("text")
+                                                           ,A3($Html$Events.on,
+                                                           "input",
+                                                           $Html$Events.targetValue,
+                                                           function ($) {
+                                                              return $Signal.send(updateChannel)(Number($));
+                                                           })
+                                                           ,$Html$Attributes.style(_L.fromArray([{ctor: "_Tuple2"
+                                                                                                 ,_0: "width"
+                                                                                                 ,_1: "200px"}]))]),
+                                              _L.fromArray([]))]))]));
+   };
+   var view = function (sub) {
+      return A2($Html.div,
+      _L.fromArray([$Html$Attributes.$class("container")]),
+      _L.fromArray([$HtmlConstructs.prestiTitle
+                   ,subjectField(sub.number)
+                   ,$HtmlConstructs.row(_L.fromArray([$Screens.nextScreenButton]))]));
+   };
+   var Subject = function (a) {
+      return {_: {},number: a};
+   };
+   _elm.Subject.values = {_op: _op
+                         ,Subject: Subject
+                         ,NoOp: NoOp
+                         ,Number: Number
+                         ,emptySubject: emptySubject
+                         ,update: update
+                         ,view: view
+                         ,subjectField: subjectField
+                         ,updateChannel: updateChannel};
+   return _elm.Subject.values;
 };
 Elm.Time = Elm.Time || {};
 Elm.Time.make = function (_elm) {

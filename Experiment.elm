@@ -4,10 +4,12 @@ import Html (..)
 import Html.Attributes (..)
 import Html.Events (..)
 import Signal (..)
+import List (..)
 
 import HtmlConstructs (..)
 import Sound
 import Slider
+import Screens
 import ListUtils ((!), set)
 
 -- MODELS
@@ -27,6 +29,12 @@ emptyExperiment =
     , i = 0
     }
 
+lastFragment : Experiment -> Bool
+lastFragment exp = exp.i == (length exp.samples - 1)
+
+firstFragment : Experiment -> Bool
+firstFragment exp = exp.i == 0
+
 type Update = NoOp
             | SliderUpdate Int
             | Next
@@ -41,7 +49,7 @@ update upd exp = case upd of
     NoOp -> exp
     SliderUpdate x -> { exp | rates <- set exp.rates exp.i x }
     Next -> updateSound { exp | i <- exp.i + 1 }
-    Previous -> exp
+    Previous -> updateSound { exp | i <- exp.i - 1 }
     Replay -> { exp | sound <- Sound.repeatSound exp.sound }
 
 updateSound : Experiment -> Experiment
@@ -56,10 +64,7 @@ view : Experiment -> Html
 view exp = div [ class "container" ]
     [ prestiTitle
     , getSlider exp
-    , row [ nextButton ]
-    , row [ text (toString exp.rates) ]
-    , row [ text (toString exp.sound) ]
-    , row [ text (toString exp.i) ]
+    , buttons exp
     ]
 
 getSlider : Experiment -> Html
@@ -70,6 +75,20 @@ getSlider exp = case (exp.rates ! exp.i) of
 nextButton : Html
 nextButton = button [ onClick (send experimentChannel Next) ]
                     [ text "Volgend fragment" ]
+
+previousButton : Html
+previousButton = button [ onClick (send experimentChannel Previous) ]
+                        [ text "Vorig fragment" ]
+
+buttons : Experiment -> Html
+buttons exp =
+    if firstFragment exp
+    then row [ nextButton ]
+    else if lastFragment exp
+         then row [ previousButton
+                  , Screens.nextScreenButton ]
+         else row [ previousButton
+                  , nextButton ]
 
 
 -- CHANNELS
