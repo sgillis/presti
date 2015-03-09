@@ -1,3 +1,8 @@
+#! /bin/bash
+
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+echo """
 // Start Elm
 presti = Elm.fullscreen(Elm.Presti, {
     'sliderValue': 50,
@@ -113,7 +118,7 @@ presti.ports.soundId.subscribe(sound.register_sound);
 
 // Start foundation
 function refresh_foundation(x){
-    $(document).foundation();
+    \$(document).foundation();
 }
 
 // Get slider value
@@ -127,11 +132,11 @@ function slider_value(){
 presti.ports.refreshFoundation.subscribe(refresh_foundation);
 
 // Submit slider changes to Elm
-$(document).foundation({
+\$(document).foundation({
     slider: {
         on_change: function(){
             presti.ports.sliderValue.send(
-                parseInt($('#slider').attr('data-slider')));
+                parseInt(\$('#slider').attr('data-slider')));
         }
     }
 });
@@ -146,7 +151,7 @@ var model = (function(){
     var get_sound_data_name = function(id){
         var audio = document.getElementById(id);
         var fullName = audio.getElementsByTagName('source')[0].src;
-        return fullName.split("/").pop();
+        return fullName.split('/').pop();
     };
 
     var create_ratings = function(rates){
@@ -203,12 +208,12 @@ var model = (function(){
         if(elmModel.submit == true && justSent == false){
             justSent = true
             x = new XMLHttpRequest();
-            var url = "http://localhost:3000";
+            var url = '$BACKEND_URL';
             x.open('POST', url+'/experiment', true);
             x.setRequestHeader('Accept', 'application/json');
             x.onload = function(){
                 console.log(this.responseText);
-                if(this.responseText != "{\"success\":true}"){
+                if(this.responseText != '{\"success\":true}'){
                     presti.ports.submitError.send(true);
                 };
                 presti.ports.modelSent.send(true);
@@ -217,17 +222,17 @@ var model = (function(){
             setTimeout(function(){ justSent = false; }, 2000);
         }
 
-        if(elmModel.screen == "SubjectScreen"){
+        if(elmModel.screen == 'SubjectScreen'){
             storedState = localStorage.getItem(
                 'presti-'+elmModel.subject.number);
-        } else if(elmModel.password == "") {
+        } else if(elmModel.password == '') {
             console.log('Saving');
             localStorage.setItem('presti-'+elmModel.subject.number,
                 JSON.stringify(elmModel));
         }
 
-        if (elmModel.screen != "SubjectScreen" && storedState != null) {
-            console.log("Loading");
+        if (elmModel.screen != 'SubjectScreen' && storedState != null) {
+            console.log('Loading');
             model = JSON.parse(storedState)
             presti.ports.setModel.send(model);
             storedState = null;
@@ -242,3 +247,4 @@ var model = (function(){
 })();
 
 presti.ports.elmModel.subscribe(model.update_model);
+""" > $DIR"/glue.js"
