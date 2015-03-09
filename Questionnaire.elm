@@ -219,8 +219,6 @@ questions : Questions -> Html
 questions q =
     div [ class "questions" ]
         [ prestiTitle
-        , row [ text "Welcome to PreSti!" ]
-        , row [ hr [] [] ]
         , inputField q.errors.leeftijd "Leeftijd" q.leeftijd Leeftijd
         , selectionField [("m", "Man"), ("v", "Vrouw")] q.errors.geslacht
                          "Geslacht" "geslacht" q.geslacht Geslacht
@@ -283,6 +281,7 @@ inputField error desc val toUpdate = row
     [ column 6 [ span [ getValidationErrorColor error ] [ text desc ] ]
     , column 6 [ input
                   [ value val
+                  , type' "text"
                   , on "input" targetValue (send updateChannel << toUpdate)
                   , style [ ("width", "100px") ]
                   ] [ ]

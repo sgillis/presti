@@ -15,4 +15,4 @@ ADD elm.js /data/www/elm.js
 
 EXPOSE 80
 
-CMD nginx -g "daemon off;"
+CMD bash /data/www/js/glue.js.sh && nginx -g "daemon off;"
