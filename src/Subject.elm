@@ -33,7 +33,9 @@ view : Subject -> Html
 view sub = div [ class "container" ]
     [ prestiTitle
     , subjectField sub.number
-    , row [ Screens.nextScreenButton ]
+    , if sub.number /= ""
+      then row [ Screens.nextScreenButton ]
+      else div [ ] [ ]
     ]
 
 subjectField : String -> Html
