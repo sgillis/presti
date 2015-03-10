@@ -47,6 +47,11 @@ slider size =
                       ]
                 ]
           ]
+    , row [ column 3 [ p [ ] [ text "Deel 1 heel sterk benadrukt" ] ]
+          , column 3 [ p [ style [("text-align", "right")] ]
+                         [ text "Deel 2 heel sterk benadrukt" ] ]
+          ]
+    , pageBreak
     ]
 
 leftCircle : Int -> Form
