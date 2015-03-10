@@ -1,0 +1,8 @@
+presti:
+    build: .
+    environment:
+        - BACKEND_URL=http://localhost:3000
+    volumes:
+        - .:/data/www
+    ports:
+        - 8000:80
