@@ -1,4 +1,4 @@
 *.swp
-elm-stuff/*
+src/elm-stuff/*
 elm.js
 js/glue.js
