@@ -15,7 +15,6 @@ import Questionnaire
 import Instructions
 import Experiment
 
-
 -- MODEL
 
 type Action = NoOp
@@ -31,9 +30,12 @@ type Action = NoOp
             | Username String
             | Password String
             | SetModel Model
+            | Time Float
 
 type alias Model =
-    { screen : Screens.Model
+    { startDate : Float
+    , now : Float
+    , screen : Screens.Model
     , subject : Subject.Subject
     , questions : Questionnaire.Questions
     , instructions : Instructions.Instructions
@@ -47,11 +49,13 @@ type alias Model =
 
 initialModel : Model
 initialModel =
-    { screen = Screens.initialScreen
+    { startDate = 0
+    , now = 0
+    , screen = Screens.initialScreen
     , subject = Subject.emptySubject
     , questions = Questionnaire.emptyQuestions
     , instructions = Instructions.emptyInstructions
-    , experiment = Experiment.emptyExperiment
+    , experiment = Experiment.emptyExperiment 0
     , submit = False
     , submitE = False
     , submitted = False
@@ -88,6 +92,11 @@ update action model = case action of
     Username x -> { model | username <- x }
     Password x -> { model | password <- x }
     SetModel m -> m
+    Time x -> if model.startDate == 0
+              then { model | startDate <- x
+                           , now <- x
+                           , experiment <- Experiment.emptyExperiment (round x) }
+              else { model | now <- x }
     _ -> model
 
 updateSound : Sound.Update -> Model -> Model
@@ -194,8 +203,8 @@ inputSignal =
  <| merge (ExperimentUpdate <~ subscribe Experiment.experimentChannel)
  <| merge (ModelSent <~ modelSent)
  <| merge (SubmitError <~ submitError)
-          (SetModel <~ setModel)
-
+ <| merge (SetModel <~ setModel)
+          (Time <~ currentTime)
 
 soundIdSignal : Signal Int
 soundIdSignal = .soundId <~ (getSound <~ model)
@@ -234,3 +243,5 @@ port modelSent : Signal Bool
 port submitError : Signal Bool
 
 port setModel : Signal Model
+
+port currentTime : Signal Float
