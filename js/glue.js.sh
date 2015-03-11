@@ -9,7 +9,10 @@ presti = Elm.fullscreen(Elm.Presti, {
     'donePlaying': true,
     'modelSent': false,
     'submitError': false,
+    'currentTime': new Date().getTime() / 1000,
     'setModel': {
+        'startDate': 0,
+        'now': 0,
         'screen': 'QuestionScreen',
         'username': '',
         'password': '',
@@ -77,6 +80,12 @@ presti = Elm.fullscreen(Elm.Presti, {
         }
     }
 });
+
+// Submit the current time every second
+(function submitTime(){
+    presti.ports.currentTime.send(new Date().getTime() / 1000);
+    setTimeout(submitTime, 1000);
+})();
 
 // Functions to play sound
 var sound = (function(){
@@ -233,8 +242,8 @@ var model = (function(){
 
         if (elmModel.screen != 'SubjectScreen' && storedState != null) {
             console.log('Loading');
-            model = JSON.parse(storedState)
-            presti.ports.setModel.send(model);
+            m = JSON.parse(storedState)
+            presti.ports.setModel.send(m);
             storedState = null;
         }
     };

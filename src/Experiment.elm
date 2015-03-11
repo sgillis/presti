@@ -11,7 +11,7 @@ import Files (..)
 import Sound
 import Slider
 import Screens
-import ListUtils ((!), set)
+import ListUtils ((!), set, randomize)
 
 -- MODELS
 
@@ -22,9 +22,9 @@ type alias Experiment =
     , i : Int
     }
 
-emptyExperiment : Experiment
-emptyExperiment =
-    { samples = [0..526]
+emptyExperiment : Int -> Experiment
+emptyExperiment x =
+    { samples = randomize x [0..526]
     , rates = repeat 527 50
     , sound = { soundId = 1, playSound = True }
     , i = 0
