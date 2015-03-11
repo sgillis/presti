@@ -7,6 +7,7 @@ import Signal (..)
 import List (..)
 
 import HtmlConstructs (..)
+import Files (..)
 import Sound
 import Slider
 import Screens
@@ -23,8 +24,8 @@ type alias Experiment =
 
 emptyExperiment : Experiment
 emptyExperiment =
-    { samples = [1,2]
-    , rates = [50,50]
+    { samples = [0..526]
+    , rates = repeat 527 50
     , sound = { soundId = 1, playSound = True }
     , i = 0
     }
@@ -62,7 +63,8 @@ updateSound exp = case (exp.samples ! exp.i) of
 
 view : Experiment -> Html
 view exp = div [ class "container" ]
-    [ prestiTitle
+    [ audioHtml experimentAudio
+    , prestiTitle
     , getSlider exp
     , buttons exp
     ]
