@@ -22,6 +22,16 @@ presti = Elm.fullscreen(Elm.Presti, {
         'subject': {
             'number': ''
         },
+        'example': {
+            'i': 0,
+            'rates': [50],
+            'samples': [1],
+            'repeats': [0],
+            'sound': {
+                'playSound': true,
+                'soundId': 1
+            }
+        },
         'experiment': {
             'i': 0,
             'rates': [50],

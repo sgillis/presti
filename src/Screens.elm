@@ -10,6 +10,7 @@ import Signal (..)
 type Screen = SubjectScreen
             | QuestionScreen
             | InstructionsScreen
+            | ExampleScreen
             | ExperimentScreen
             | SubmitScreen
 
@@ -26,14 +27,16 @@ fromScreen s = case s of
     SubjectScreen      -> "SubjectScreen"
     QuestionScreen     -> "QuestionScreen"
     InstructionsScreen -> "InstructionsScreen"
+    ExampleScreen      -> "ExampleScreen"
     ExperimentScreen   -> "ExperimentScreen"
-    SubmitScreen   -> "SubmitScreen"
+    SubmitScreen       -> "SubmitScreen"
 
 toScreen : String -> Screen
 toScreen s = case s of
     "SubjectScreen"      -> SubjectScreen
     "QuestionScreen"     -> QuestionScreen
     "InstructionsScreen" -> InstructionsScreen
+    "ExampleScreen"      -> ExampleScreen
     "ExperimentScreen"   -> ExperimentScreen
     "SubmitScreen"       -> SubmitScreen
     _                    -> QuestionScreen
@@ -51,7 +54,8 @@ previousScreen model = case toScreen model of
     SubjectScreen      -> fromScreen SubjectScreen
     QuestionScreen     -> fromScreen SubjectScreen
     InstructionsScreen -> fromScreen QuestionScreen
-    ExperimentScreen   -> fromScreen InstructionsScreen
+    ExampleScreen      -> fromScreen InstructionsScreen
+    ExperimentScreen   -> fromScreen ExampleScreen
     SubmitScreen       -> fromScreen ExperimentScreen
     _                  -> fromScreen QuestionScreen
 
@@ -59,7 +63,8 @@ nextScreen : Model -> Model
 nextScreen model = case toScreen model of
     SubjectScreen      -> fromScreen QuestionScreen
     QuestionScreen     -> fromScreen InstructionsScreen
-    InstructionsScreen -> fromScreen ExperimentScreen
+    InstructionsScreen -> fromScreen ExampleScreen
+    ExampleScreen      -> fromScreen ExperimentScreen
     ExperimentScreen   -> fromScreen SubmitScreen
     SubmitScreen       -> fromScreen SubmitScreen
     _                  -> fromScreen QuestionScreen

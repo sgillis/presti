@@ -14,6 +14,7 @@ import Slider
 import Subject
 import Questionnaire
 import Instructions
+import Example
 import Experiment
 
 -- MODEL
@@ -22,6 +23,7 @@ type Action = NoOp
             | ScreenUpdate Screens.Update
             | SubjectUpdate Subject.Update
             | QuestionnaireUpdate Questionnaire.Update
+            | ExampleUpdate Example.Update
             | ExperimentUpdate Experiment.Update
             | SliderUpdate Slider.Update
             | SoundUpdate Sound.Update
@@ -40,6 +42,7 @@ type alias Model =
     , subject : Subject.Subject
     , questions : Questionnaire.Questions
     , instructions : Instructions.Instructions
+    , example : Example.Experiment
     , experiment : Experiment.Experiment
     , submit : Bool
     , submitE : Bool
@@ -56,6 +59,7 @@ initialModel =
     , subject = Subject.emptySubject
     , questions = Questionnaire.emptyQuestions
     , instructions = Instructions.emptyInstructions
+    , example = Example.emptyExperiment
     , experiment = Experiment.emptyExperiment 0
     , submit = False
     , submitE = False
@@ -67,6 +71,7 @@ initialModel =
 getSound : Model -> Sound.Model
 getSound model = case Screens.toScreen model.screen of
     Screens.InstructionsScreen -> model.instructions.sound
+    Screens.ExampleScreen -> model.example.sound
     Screens.ExperimentScreen -> model.experiment.sound
     _ -> Sound.emptyModel
 
@@ -81,6 +86,8 @@ update action model = case action of
         { model | subject <- Subject.update update model.subject }
     QuestionnaireUpdate update ->
         { model | questions <- Questionnaire.update update model.questions }
+    ExampleUpdate update ->
+        { model | example <- Example.update update model.example }
     ExperimentUpdate update ->
         { model | experiment <- Experiment.update update model.experiment }
     SliderUpdate update -> updateSlider update model
@@ -107,6 +114,10 @@ updateSound u model = case Screens.toScreen model.screen of
         let ins = model.instructions
             newIns = { ins | sound <- Sound.update u ins.sound }
         in { model | instructions <- newIns }
+    Screens.ExampleScreen ->
+        let ex = model.example
+            newEx = { ex | sound <- Sound.update u ex.sound }
+        in { model | example <- newEx }
     Screens.ExperimentScreen ->
         let exp = model.experiment
             newExp = { exp | sound <- Sound.update u exp.sound }
@@ -136,6 +147,7 @@ view model = case Screens.toScreen model.screen of
     Screens.SubjectScreen -> Subject.view model.subject
     Screens.QuestionScreen -> Questionnaire.view model.questions
     Screens.InstructionsScreen -> Instructions.view model.instructions
+    Screens.ExampleScreen -> Example.view model.example
     Screens.ExperimentScreen -> Experiment.view model.experiment
     Screens.SubmitScreen -> submitView model
     _ -> row [ text "unknown screen" ]
@@ -202,6 +214,7 @@ inputSignal =
  <| merge (QuestionnaireUpdate <~ subscribe Questionnaire.updateChannel)
  <| merge (SliderUpdate <~ (Slider.DragSlider <~ sliderValue))
  <| merge (SoundUpdate <~ (Sound.SoundPlayed <~ donePlaying))
+ <| merge (ExampleUpdate <~ subscribe Example.exampleChannel)
  <| merge (ExperimentUpdate <~ subscribe Experiment.experimentChannel)
  <| merge (ModelSent <~ modelSent)
  <| merge (SubmitError <~ submitError)
