@@ -26,6 +26,7 @@ presti = Elm.fullscreen(Elm.Presti, {
             'i': 0,
             'rates': [50],
             'samples': [1],
+            'repeats': [0],
             'sound': {
                 'playSound': true,
                 'soundId': 1
@@ -163,12 +164,13 @@ var model = (function(){
         return fullName.split('/').pop();
     };
 
-    var create_ratings = function(rates){
+    var create_ratings = function(rates, repeats){
         return rates.map(function(val, index, rs){
             return {
                 'position': index+1,
                 'rating': val,
-                'sample': get_sound_data_name(index+1)
+                'sample': get_sound_data_name(index+1),
+                'repeats': repeats[index]
             }
         });
     };
@@ -207,7 +209,8 @@ var model = (function(){
                 'username': elmModel.username,
                 'password': elmModel.password
             },
-            'ratings': create_ratings(elmModel.experiment.rates)
+            'ratings': create_ratings(elmModel.experiment.rates,
+                                      elmModel.experiment.repeats)
         }
         return JSON.stringify(m);
     };
