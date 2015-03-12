@@ -7,6 +7,7 @@ import Signal (..)
 import Time (..)
 
 import HtmlConstructs (..)
+import Files (..)
 import Screens
 import Sound
 import Slider
@@ -141,7 +142,8 @@ view model = case Screens.toScreen model.screen of
 
 submitView : Model -> Html
 submitView model = div [ class "container" ]
-    [ prestiTitle
+    [ audioHtml experimentAudio
+    , prestiTitle
     , usernameField model.username
     , passwordField model.password
     , row [ button [ onClick (send actionChannel Submit) ]

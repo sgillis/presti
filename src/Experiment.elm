@@ -11,13 +11,14 @@ import Files (..)
 import Sound
 import Slider
 import Screens
-import ListUtils ((!), set, randomize)
+import ListUtils ((!), set, randomize, (!!))
 
 -- MODELS
 
 type alias Experiment =
     { samples : List Int
     , rates : List Int
+    , repeats : List Int
     , sound : Sound.Model
     , i : Int
     }
@@ -26,6 +27,7 @@ emptyExperiment : Int -> Experiment
 emptyExperiment x =
     { samples = randomize x [0..526]
     , rates = repeat 527 50
+    , repeats = repeat 527 0
     , sound = { soundId = 1, playSound = True }
     , i = 0
     }
@@ -51,7 +53,8 @@ update upd exp = case upd of
     SliderUpdate x -> { exp | rates <- set exp.rates exp.i x }
     Next -> updateSound { exp | i <- exp.i + 1 }
     Previous -> updateSound { exp | i <- exp.i - 1 }
-    Replay -> { exp | sound <- Sound.repeatSound exp.sound }
+    Replay -> { exp | sound <- Sound.repeatSound exp.sound
+                    , repeats <- set exp.repeats exp.i (exp.repeats !! exp.i + 1) }
 
 updateSound : Experiment -> Experiment
 updateSound exp = case (exp.samples ! exp.i) of
@@ -65,6 +68,7 @@ view : Experiment -> Html
 view exp = div [ class "container" ]
     [ audioHtml experimentAudio
     , prestiTitle
+    , row [ text <| "Brabbel " ++ toString (exp.i + 1) ++ "/" ++ toString (length exp.samples) ]
     , getSlider exp
     , buttons exp
     ]
@@ -78,19 +82,17 @@ nextButton : Html
 nextButton = button [ onClick (send experimentChannel Next) ]
                     [ text "Volgend fragment" ]
 
-previousButton : Html
-previousButton = button [ onClick (send experimentChannel Previous) ]
-                        [ text "Vorig fragment" ]
+replayButton : Experiment -> Html
+replayButton exp =
+    if exp.repeats !! exp.i >= 2
+    then div [ ] [ ]
+    else button [ onClick (send experimentChannel Replay) ] [ text "Herbeluister" ]
 
 buttons : Experiment -> Html
 buttons exp =
-    if firstFragment exp
-    then row [ nextButton ]
-    else if lastFragment exp
-         then row [ previousButton
-                  , Screens.nextScreenButton ]
-         else row [ previousButton
-                  , nextButton ]
+    if lastFragment exp
+    then row [ replayButton exp, Screens.nextScreenButton ]
+    else row [ replayButton exp, nextButton ]
 
 
 -- CHANNELS
