@@ -179,7 +179,9 @@ var model = (function(){
         m = {
             'subject': {
                 'number': elmModel.subject.number,
-                'experimenter': elmModel.username
+                'experimenter': elmModel.username,
+                'start_date': new Date(elmModel.startDate*1000).toISOString(),
+                'end_date': new Date(elmModel.now*1000).toISOString()
             },
             'questions': {
                 'question1': elmModel.questions.vraag1,
