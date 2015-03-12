@@ -178,7 +178,8 @@ var model = (function(){
     var create_post_string = function(){
         m = {
             'subject': {
-                'number': elmModel.subject.number
+                'number': elmModel.subject.number,
+                'experimenter': elmModel.username
             },
             'questions': {
                 'question1': elmModel.questions.vraag1,
