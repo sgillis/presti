@@ -15,6 +15,7 @@ import Subject
 import Questionnaire
 import Instructions
 import Example
+import Practice
 import Experiment
 
 -- MODEL
@@ -24,6 +25,7 @@ type Action = NoOp
             | SubjectUpdate Subject.Update
             | QuestionnaireUpdate Questionnaire.Update
             | ExampleUpdate Example.Update
+            | PracticeUpdate Practice.Update
             | ExperimentUpdate Experiment.Update
             | SliderUpdate Slider.Update
             | SoundUpdate Sound.Update
@@ -43,6 +45,7 @@ type alias Model =
     , questions : Questionnaire.Questions
     , instructions : Instructions.Instructions
     , example : Example.Experiment
+    , practice : Practice.Experiment
     , experiment : Experiment.Experiment
     , submit : Bool
     , submitE : Bool
@@ -60,6 +63,7 @@ initialModel =
     , questions = Questionnaire.emptyQuestions
     , instructions = Instructions.emptyInstructions
     , example = Example.emptyExperiment
+    , practice = Practice.emptyExperiment
     , experiment = Experiment.emptyExperiment 0
     , submit = False
     , submitE = False
@@ -72,6 +76,7 @@ getSound : Model -> Sound.Model
 getSound model = case Screens.toScreen model.screen of
     Screens.InstructionsScreen -> model.instructions.sound
     Screens.ExampleScreen -> model.example.sound
+    Screens.PracticeScreen -> model.practice.sound
     Screens.ExperimentScreen -> model.experiment.sound
     _ -> Sound.emptyModel
 
@@ -88,6 +93,8 @@ update action model = case action of
         { model | questions <- Questionnaire.update update model.questions }
     ExampleUpdate update ->
         { model | example <- Example.update update model.example }
+    PracticeUpdate update ->
+        { model | practice <- Practice.update update model.practice }
     ExperimentUpdate update ->
         { model | experiment <- Experiment.update update model.experiment }
     SliderUpdate update -> updateSlider update model
@@ -118,6 +125,10 @@ updateSound u model = case Screens.toScreen model.screen of
         let ex = model.example
             newEx = { ex | sound <- Sound.update u ex.sound }
         in { model | example <- newEx }
+    Screens.PracticeScreen ->
+        let pr = model.practice
+            newPr = { pr | sound <- Sound.update u pr.sound }
+        in { model | practice <- newPr }
     Screens.ExperimentScreen ->
         let exp = model.experiment
             newExp = { exp | sound <- Sound.update u exp.sound }
@@ -136,6 +147,11 @@ updateSlider u model = case Screens.toScreen model.screen of
             { model | example <- Example.update
                                  (Example.SliderUpdate x)
                                  model.example }
+    Screens.PracticeScreen -> case u of
+        Slider.DragSlider x ->
+            { model | practice <- Practice.update
+                                  (Practice.SliderUpdate x)
+                                  model.practice }
     Screens.ExperimentScreen -> case u of
         Slider.DragSlider x ->
             { model | experiment <- Experiment.update
@@ -153,14 +169,14 @@ view model = case Screens.toScreen model.screen of
     Screens.QuestionScreen -> Questionnaire.view model.questions
     Screens.InstructionsScreen -> Instructions.view model.instructions
     Screens.ExampleScreen -> Example.view model.example
+    Screens.PracticeScreen -> Practice.view model.practice
     Screens.ExperimentScreen -> Experiment.view model.experiment
     Screens.SubmitScreen -> submitView model
     _ -> row [ text "unknown screen" ]
 
 submitView : Model -> Html
 submitView model = div [ class "container" ]
-    [ audioHtml experimentAudio
-    , prestiTitle
+    [ prestiTitle
     , usernameField model.username
     , passwordField model.password
     , row [ button [ onClick (send actionChannel Submit) ]
@@ -220,6 +236,7 @@ inputSignal =
  <| merge (SliderUpdate <~ (Slider.DragSlider <~ sliderValue))
  <| merge (SoundUpdate <~ (Sound.SoundPlayed <~ donePlaying))
  <| merge (ExampleUpdate <~ subscribe Example.exampleChannel)
+ <| merge (PracticeUpdate <~ subscribe Practice.practiceChannel)
  <| merge (ExperimentUpdate <~ subscribe Experiment.experimentChannel)
  <| merge (ModelSent <~ modelSent)
  <| merge (SubmitError <~ submitError)

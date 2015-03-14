@@ -40,3 +40,11 @@ fisherYatesStep seed xs =
         chosen = xs !! randomN
         xs' = List.filter (\x -> x /= chosen) xs
     in (chosen, xs', newSeed)
+
+zip : List a -> List b -> List (a, b)
+zip xs ys =
+    case xs of
+         []       -> []
+         (x::xs') -> case ys of
+                          []       -> []
+                          (y::ys') -> (x,y) :: (zip xs' ys')
