@@ -26,9 +26,9 @@ type alias Experiment =
 emptyExperiment : Experiment
 emptyExperiment =
     { samples = [0..5]
-    , rates = repeat 6 50
+    , rates = [10, 20, 30, 40, 50, 60]
     , repeats = repeat 6 0
-    , sound = { soundId = 1, playSound = True }
+    , sound = { soundId = 0, playSound = True }
     , i = 0
     }
 

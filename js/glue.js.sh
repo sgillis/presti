@@ -44,7 +44,8 @@ presti = Elm.fullscreen(Elm.Presti, {
             'firstPhase': 1,
             'error': false,
             'endEarly': false,
-            'done': false
+            'done': false,
+            'explanation': true
         },
         'experiment': {
             'i': 0,
@@ -183,12 +184,12 @@ var model = (function(){
     var storedState = null;
     var justSaved = false;
 
-    var create_ratings = function(rates, repeats, practice, sampleNames){
+    var create_ratings = function(rates, repeats, practice, sampleNames, sampleIndices){
         return rates.map(function(val, index, rs){
             return {
                 'position': index+1,
                 'rating': val,
-                'sample': sampleNames[index],
+                'sample': sampleNames[sampleIndices[index]],
                 'repeats': repeats[index],
                 'practice': practice
             }
@@ -234,15 +235,18 @@ var model = (function(){
             },
             'ratings': create_ratings(
                 elmModel.experiment.rates,elmModel.experiment.repeats,
-                false, experimentSamples).concat(
+                false, experimentSamples, elmModel.experiment.samples).concat(
                     create_ratings(
                         elmModel.practice.rates,elmModel.practice.repeats,
-                        true, practiceSamples))
+                        true, practiceSamples, elmModel.practice.samples))
         }
         return JSON.stringify(m);
     };
 
     var update_model = function(new_model){
+        if(new_model.screen != elmModel.screen){
+            window.scrollTo(0,0);
+        }
         elmModel = new_model;
         if(elmModel.submit == true && justSent == false){
             justSent = true
