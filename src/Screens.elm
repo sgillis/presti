@@ -11,6 +11,7 @@ type Screen = SubjectScreen
             | QuestionScreen
             | InstructionsScreen
             | ExampleScreen
+            | PracticeScreen
             | ExperimentScreen
             | SubmitScreen
 
@@ -28,6 +29,7 @@ fromScreen s = case s of
     QuestionScreen     -> "QuestionScreen"
     InstructionsScreen -> "InstructionsScreen"
     ExampleScreen      -> "ExampleScreen"
+    PracticeScreen     -> "PracticeScreen"
     ExperimentScreen   -> "ExperimentScreen"
     SubmitScreen       -> "SubmitScreen"
 
@@ -37,6 +39,7 @@ toScreen s = case s of
     "QuestionScreen"     -> QuestionScreen
     "InstructionsScreen" -> InstructionsScreen
     "ExampleScreen"      -> ExampleScreen
+    "PracticeScreen"     -> PracticeScreen
     "ExperimentScreen"   -> ExperimentScreen
     "SubmitScreen"       -> SubmitScreen
     _                    -> QuestionScreen
@@ -55,7 +58,8 @@ previousScreen model = case toScreen model of
     QuestionScreen     -> fromScreen SubjectScreen
     InstructionsScreen -> fromScreen QuestionScreen
     ExampleScreen      -> fromScreen InstructionsScreen
-    ExperimentScreen   -> fromScreen ExampleScreen
+    PracticeScreen     -> fromScreen ExampleScreen
+    ExperimentScreen   -> fromScreen PracticeScreen
     SubmitScreen       -> fromScreen ExperimentScreen
     _                  -> fromScreen QuestionScreen
 
@@ -64,7 +68,8 @@ nextScreen model = case toScreen model of
     SubjectScreen      -> fromScreen QuestionScreen
     QuestionScreen     -> fromScreen InstructionsScreen
     InstructionsScreen -> fromScreen ExampleScreen
-    ExampleScreen      -> fromScreen ExperimentScreen
+    ExampleScreen      -> fromScreen PracticeScreen
+    PracticeScreen     -> fromScreen ExperimentScreen
     ExperimentScreen   -> fromScreen SubmitScreen
     SubmitScreen       -> fromScreen SubmitScreen
     _                  -> fromScreen QuestionScreen
