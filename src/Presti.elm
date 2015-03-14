@@ -177,6 +177,11 @@ view model = case Screens.toScreen model.screen of
 submitView : Model -> Html
 submitView model = div [ class "container" ]
     [ prestiTitle
+    , row [ p [ ] [ text """
+                   Je bent klaar! Bedankt voor je deelname
+                   """
+                  ]
+          ]
     , usernameField model.username
     , passwordField model.password
     , row [ button [ onClick (send actionChannel Submit) ]
@@ -190,9 +195,9 @@ submissionComplete : Model -> Html
 submissionComplete model =
     if model.submitE
     then row [ text """
-Er ging iets mis bij het doorsturen. Kopieer onderstaande data naar de harde
-schijf en contacteer de administrator
-"""
+                    Er ging iets mis bij het doorsturen. Kopieer onderstaande
+                    data naar de harde schijf en contacteer de administrator
+                    """
              , pageBreak
              , text <| toString model ]
     else row [ text "Data is doorgestuurd" ]

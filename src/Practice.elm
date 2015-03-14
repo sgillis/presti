@@ -26,6 +26,7 @@ type alias Experiment =
     , error : Bool
     , endEarly : Bool
     , done : Bool
+    , explanation : Bool
     }
 
 emptyExperiment : Experiment
@@ -33,12 +34,13 @@ emptyExperiment =
     { samples = [0..9]
     , rates = repeat 10 50
     , repeats = repeat 10 0
-    , sound = { soundId = 1, playSound = True }
+    , sound = { soundId = 0, playSound = True }
     , i = 0
     , firstPhase = 5
     , error = False
     , endEarly = False
     , done = False
+    , explanation = True
     }
 
 lastFragment : Experiment -> Bool
@@ -66,6 +68,7 @@ type Update = NoOp
             | Previous
             | Replay
             | End
+            | ExplanationDone
 
 correctAnswers : List (Int, Int)
 correctAnswers =
@@ -107,6 +110,7 @@ update upd exp = case upd of
                     , repeats <- set exp.repeats exp.i (exp.repeats !! exp.i + 1) }
     End -> { exp | done <- True
                  , endEarly <- endEarly exp }
+    ExplanationDone -> { exp | explanation <- False }
 
 updateSound : Experiment -> Experiment
 updateSound exp = case (exp.samples ! exp.i) of
@@ -117,11 +121,29 @@ updateSound exp = case (exp.samples ! exp.i) of
 -- VIEW
 
 view : Experiment -> Html
-view exp = if exp.done
-           then if exp.endEarly
-                then prematureEnd
-                else startExperiment
-           else mainView exp
+view exp = if exp.explanation
+           then explanation
+           else if exp.done
+                then if exp.endEarly
+                     then prematureEnd
+                     else startExperiment
+                else mainView exp
+
+explanation : Html
+explanation = div [ class "container" ]
+    [ prestiTitle
+    , row [ p [ ] [ text """
+                         Je mag nu zelf proberen om de correcte nadruk aan te
+                         geven.  Bij de eerste vijf brabbels zal te horen
+                         krijgen krijgen als je beoordeling fout zit. Bij de
+                         laatste vijf brabbels krijg je geen feedback meer.
+                         """
+                  ]
+          ]
+    , row [ button [ onClick (send practiceChannel ExplanationDone) ]
+                   [ text "Start" ]
+          ]
+    ]
 
 prematureEnd : Html
 prematureEnd = div [ class "container" ]
@@ -132,9 +154,24 @@ prematureEnd = div [ class "container" ]
 startExperiment : Html
 startExperiment = div [ class "container" ]
     [ prestiTitle
-    , row [ text "Ga verder naar het experiment" ]
-    , pageBreak
-    , row [ Screens.nextScreenButton ]
+    , row [ p [ ] [ text """
+                         Je oefenfase zit erop. Als je geen vragen meer hebt
+                         kan je beginnen aan het experiment.
+                         """
+                  ]
+          , p [ ] [ text """
+                         Heb je nog vragen? Spreek dan nu even de begeleider
+                         aan.
+                         """
+                  ]
+          , p [ ] [ text """
+                         Ben je klaar om te beginnen? Druk op start.
+                         """
+                  ]
+          ]
+    , row [ button [ onClick (send Screens.screenChannel Screens.NextScreen) ]
+                   [ text "Start" ]
+          ]
     ]
 
 mainView : Experiment -> Html
