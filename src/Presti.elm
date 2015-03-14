@@ -131,6 +131,11 @@ updateSlider u model = case Screens.toScreen model.screen of
         let ins = model.instructions
             newIns = { ins | slider <- Slider.update u ins.slider }
         in { model | instructions <- newIns }
+    Screens.ExampleScreen -> case u of
+        Slider.DragSlider x ->
+            { model | example <- Example.update
+                                 (Example.SliderUpdate x)
+                                 model.example }
     Screens.ExperimentScreen -> case u of
         Slider.DragSlider x ->
             { model | experiment <- Experiment.update
