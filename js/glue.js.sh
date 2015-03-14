@@ -167,6 +167,7 @@ var model = (function(){
     var elmModel = {};
     var justSent = false;
     var storedState = null;
+    var justSaved = false;
 
     var get_sound_data_name = function(id){
         var audio = document.getElementById(id);
@@ -250,10 +251,12 @@ var model = (function(){
         if(elmModel.screen == 'SubjectScreen'){
             storedState = localStorage.getItem(
                 'presti-'+elmModel.subject.number);
-        } else if(elmModel.password == '') {
+        } else if(elmModel.password == '' && justSaved == false) {
             console.log('Saving');
             localStorage.setItem('presti-'+elmModel.subject.number,
                 JSON.stringify(elmModel));
+            justSaved = true;
+            setTimeout(function(){ justSaved = false; }, 5000);
         }
 
         if (elmModel.screen != 'SubjectScreen' && storedState != null) {
