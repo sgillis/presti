@@ -25,13 +25,10 @@ type alias Experiment =
 
 emptyExperiment : Int -> Experiment
 emptyExperiment x =
-    let samples = randomize x [0..2]
-    in -- { samples = randomize x [0..526]
-       -- , rates = repeat 527 50
-       -- , repeats = repeat 527 0
-       { samples = samples
-       , rates = repeat 3 50
-       , repeats = repeat 3 0
+    let samples = randomize x [0..526]
+    in { samples = samples
+       , rates = repeat 527 50
+       , repeats = repeat 527 0
        , sound = { soundId = samples !! 0, playSound = True }
        , i = 0
        }
