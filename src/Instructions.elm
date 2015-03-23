@@ -98,7 +98,7 @@ instructions3 = row
     [ p [ ] [ text """
                    Voor we aan de slag gaan, laten we je eerst 5 voorbeelden
                    zien en horen. Je zal telkens een brabbel horen en je zal
-                   zien hoe het pijltje in de juiste positie geschoven wordt.
+                   zien hoe het balkje in de juiste positie geschoven wordt.
                    Jij zal op dezelfde manier tewerk moeten gaan in het
                    experiment.
                    """
@@ -107,9 +107,9 @@ instructions3 = row
                    Na deze 5 voorbeelden kan je zelf even oefenen op 18
                    brabbels waarin de nadruk duidelijk te horen is. Bij de
                    eerste 9 brabbels zal je de boodschap “probeer opnieuw”
-                   krijgen, als je het pijltje aan de foute kant van de as
+                   krijgen, als je het balkje aan de foute kant van de as
                    geplaatst hebt. Dit wil namelijk zeggen dat je de nadruk
-                   niet correct gelokaliseerd hebt. Als je pijltje aan de
+                   niet correct gelokaliseerd hebt. Als je balkje aan de
                    juiste kant staat kan je naar de volgende brabbel gaan.
                    """
             ]
@@ -154,7 +154,7 @@ instructions3 = row
                           , ul [ ] [ li [ ]
                                         [ text """
                                                Bij de eerste 9 kan je enkel
-                                               doorgaan wanneer het pijltje in
+                                               doorgaan wanneer het balkje in
                                                de juiste positie staat.
                                                """
                                         ]
