@@ -35,7 +35,7 @@ emptyInstructions =
 
 view : Instructions -> Html
 view model = div [ class "container" ]
-    [ audioHtml experimentAudio
+    [ audioHtml trialAudio
     , prestiTitle
     , instructions1
     , Slider.slider model.slider
