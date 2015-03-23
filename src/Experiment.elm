@@ -69,10 +69,17 @@ view : Experiment -> Html
 view exp = div [ class "container" ]
     [ audioHtml experimentAudio
     , prestiTitle
-    , row [ text <| "Brabbel " ++ toString (exp.i + 1) ++ "/" ++ toString (length exp.samples) ]
+    , progressBar exp.i (length exp.samples - 1)
     , getSlider exp
     , buttons exp
     ]
+
+progressBar : Int -> Int -> Html
+progressBar x total = row [ div [ class "progress round" ]
+    [ span [ class "meter"
+           , style [("width", toString (x*100 // total) ++ "%")]
+           ] [ ]
+    ] ]
 
 getSlider : Experiment -> Html
 getSlider exp = case (exp.rates ! exp.i) of
