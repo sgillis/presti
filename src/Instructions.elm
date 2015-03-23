@@ -96,7 +96,7 @@ instructions2 = row
 instructions3 : Html
 instructions3 = row
     [ p [ ] [ text """
-                   Voor we aan de slag gaan, laten we je eerst 5 voorbeelden
+                   Voor we aan de slag gaan, laten we je eerst 6 voorbeelden
                    zien en horen. Je zal telkens een brabbel horen en je zal
                    zien hoe het balkje in de juiste positie geschoven wordt.
                    Jij zal op dezelfde manier tewerk moeten gaan in het
@@ -104,9 +104,9 @@ instructions3 = row
                    """
             ]
     , p [ ] [ text """
-                   Na deze 5 voorbeelden kan je zelf even oefenen op 18
+                   Na deze 6 voorbeelden kan je zelf even oefenen op 20
                    brabbels waarin de nadruk duidelijk te horen is. Bij de
-                   eerste 9 brabbels zal je de boodschap “probeer opnieuw”
+                   eerste 10 brabbels zal je de boodschap “probeer opnieuw”
                    krijgen, als je het balkje aan de foute kant van de as
                    geplaatst hebt. Dit wil namelijk zeggen dat je de nadruk
                    niet correct gelokaliseerd hebt. Als je balkje aan de
@@ -114,7 +114,7 @@ instructions3 = row
                    """
             ]
     , p [ ] [ text """
-                   Bij de laatste 9 brabbels uit de oefenfase zal je geen
+                   Bij de laatste 10 brabbels uit de oefenfase zal je geen
                    herkansing meer krijgen en moet je zelf de nadruk weten te
                    lokaliseren. Als je dat lukt, mag je aan het eigenlijke
                    experiment beginnen.
@@ -140,7 +140,7 @@ instructions3 = row
             ]
     , p [ ] [ b [ ] [ text "Kort samengevat:" ]
             , ul [ ] [ li [ ] [ text """
-                                     We tonen je eerst 5 voorbeelden zodanig
+                                     We tonen je eerst 6 voorbeelden zodanig
                                      dat  je eens kan horen en zien hoe je te
                                      werk moet gaan
                                      """
@@ -148,19 +148,19 @@ instructions3 = row
                      , li [ ]
                           [ text """
                                  Dan begint de oefenfase die bestaat uit de
-                                 beoordeling van 18 duidelijke
+                                 beoordeling van 20 duidelijke
                                  oefenbrabbels:
                                  """
                           , ul [ ] [ li [ ]
                                         [ text """
-                                               Bij de eerste 9 kan je enkel
+                                               Bij de eerste 10 kan je enkel
                                                doorgaan wanneer het balkje in
                                                de juiste positie staat.
                                                """
                                         ]
                                    , li [ ]
                                         [ text """
-                                               Bij de laatste 9 krijg je geen
+                                               Bij de laatste 10 krijg je geen
                                                feedback meer.
                                                """
                                         ]
