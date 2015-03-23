@@ -31,9 +31,9 @@ type alias Experiment =
 
 emptyExperiment : Experiment
 emptyExperiment =
-    { samples = [0..9]
-    , rates = repeat 10 50
-    , repeats = repeat 10 0
+    { samples = [0..19]
+    , rates = repeat 20 50
+    , repeats = repeat 20 0
     , sound = { soundId = 0, playSound = True }
     , i = 0
     , firstPhase = 5
@@ -72,16 +72,26 @@ type Update = NoOp
 
 correctAnswers : List (Int, Int)
 correctAnswers =
-    [ (0, 20)
-    , (0, 20)
-    , (0, 20)
-    , (0, 20)
-    , (0, 20)
-    , (0, 20)
-    , (0, 20)
-    , (0, 20)
-    , (0, 20)
-    , (0, 20)
+    [ (0, 40)
+    , (0, 40)
+    , (60, 100)
+    , (0, 40)
+    , (0, 40)
+    , (60, 100)
+    , (0, 40)
+    , (60, 100)
+    , (0, 40)
+    , (60, 100)
+    , (60, 100)
+    , (60, 100)
+    , (60, 100)
+    , (0, 40)
+    , (60, 100)
+    , (0, 40)
+    , (60, 100)
+    , (0, 40)
+    , (0, 40)
+    , (60, 100)
     ]
 
 isCorrect : Experiment -> Bool
@@ -176,7 +186,7 @@ startExperiment = div [ class "container" ]
 
 mainView : Experiment -> Html
 mainView exp = div [ class "container" ]
-    [ audioHtml experimentAudio
+    [ audioHtml trainingAudio
     , prestiTitle
     , row [ text <| "Oefenbrabbel " ++ toString (exp.i + 1) ++ "/" ++ toString (length exp.samples) ]
     , getSlider exp

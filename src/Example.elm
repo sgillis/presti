@@ -26,7 +26,7 @@ type alias Experiment =
 emptyExperiment : Experiment
 emptyExperiment =
     { samples = [0..5]
-    , rates = [10, 20, 30, 40, 50, 60]
+    , rates = [20, 50, 80, 50, 70, 30]
     , repeats = repeat 6 0
     , sound = { soundId = 0, playSound = True }
     , i = 0
@@ -46,12 +46,12 @@ type Update = NoOp
 
 explanationStrings : List String
 explanationStrings =
-    [ "In deze brabbel hoor je duidelijk dat het eerste deel heel veel nadruk krijgt en de tweede heel weinig."
-    , "In deze brabbel hoor je duidelijk dat het tweede deel heel veel nadruk krijgt en de eerste heel weinig."
-    , "test3"
-    , "test4"
-    , "test5"
-    , "test6"
+    [ "De nadruk ligt op het eerste deel."
+    , "De nadruk is op beide delen nagenoeg gelijk."
+    , "De nadruk ligt op het tweede deel."
+    , "De nadruk is op beide delen nagenoeg gelijk."
+    , "De nadruk ligt op het tweede deel."
+    , "De nadruk ligt op het eerste deel."
     ]
 
 
@@ -76,7 +76,7 @@ updateSound exp = case (exp.samples ! exp.i) of
 
 view : Experiment -> Html
 view exp = div [ class "container" ]
-    [ audioHtml experimentAudio
+    [ audioHtml trialAudio
     , prestiTitle
     , row [ text <| "Voorbeeld " ++ toString (exp.i + 1) ++ "/" ++ toString (length exp.samples) ]
     , getSlider exp

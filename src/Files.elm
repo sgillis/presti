@@ -17,6 +17,40 @@ nameToAudio (audioId, srcName) = audio [ id <| toString audioId ]
              ] [ ]
     ]
 
+trialAudio : List String
+trialAudio =
+    [ "titi_tochee_I.wav"
+    , "koko_level_K.wav"
+    , "wawa_iamb_J.wav"
+    , "baba_level_K.wav"
+    , "didi_iamb_I.wav"
+    , "gogo_trochee_J.wav"
+    ]
+
+trainingAudio : List String
+trainingAudio =
+    [ "wawa_trochee_J.wav"
+    , "baba_trochee_K.wav"
+    , "titi_iamb_J.wav"
+    , "koko_trochee_K.wav"
+    , "didi_trochee_K.wav"
+    , "gogo_iamb_J.wav"
+    , "didi_trochee_I.wav"
+    , "koko_iamb_I.wav"
+    , "gogo_trochee_K.wav"
+    , "titi_iamb_I.wav"
+    , "koko_iamb_K.wav"
+    , "baba_iamb_J.wav"
+    , "didi_iamb_K.wav"
+    , "koko_trochee_I.wav"
+    , "baba_iamb_K.wav"
+    , "titi_trochee_J.wav"
+    , "gogo_iamb_K.wav"
+    , "wawa_trochee_I.wav"
+    , "baba_trochee_J.wav"
+    , "wawa_iamb_I.wav"
+    ]
+
 experimentAudio : List String
 experimentAudio =
     [ "1001_PRELEX_BOB010421(01).wav"
