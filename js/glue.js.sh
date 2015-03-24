@@ -293,16 +293,28 @@ var model = (function(){
 
 presti.ports.elmModel.subscribe(model.update_model);
 
-var practiceSamples = ['sample1',
-                       'sample2',
-                       'sample3',
-                       'sample4',
-                       'sample5',
-                       'sample6',
-                       'sample7',
-                       'sample8',
-                       'sample9',
-                       'sample10']
+var practiceSamples =
+    [ 'wawa_trochee_J.wav'
+    , 'baba_trochee_K.wav'
+    , 'titi_iamb_J.wav'
+    , 'koko_trochee_K.wav'
+    , 'didi_trochee_K.wav'
+    , 'gogo_iamb_J.wav'
+    , 'didi_trochee_I.wav'
+    , 'koko_iamb_I.wav'
+    , 'gogo_trochee_K.wav'
+    , 'titi_iamb_I.wav'
+    , 'koko_iamb_K.wav'
+    , 'baba_iamb_J.wav'
+    , 'didi_iamb_K.wav'
+    , 'koko_trochee_I.wav'
+    , 'baba_iamb_K.wav'
+    , 'titi_trochee_J.wav'
+    , 'gogo_iamb_K.wav'
+    , 'wawa_trochee_I.wav'
+    , 'baba_trochee_J.wav'
+    , 'wawa_iamb_I.wav'
+    ]
 
 var experimentSamples =
     [ '1001_PRELEX_BOB010421(01).wav'
