@@ -144,9 +144,11 @@ explanation = div [ class "container" ]
     [ prestiTitle
     , row [ p [ ] [ text """
                          Je mag nu zelf proberen om de correcte nadruk aan te
-                         geven.  Bij de eerste vijf brabbels zal te horen
-                         krijgen krijgen als je beoordeling fout zit. Bij de
-                         laatste vijf brabbels krijg je geen feedback meer.
+                         geven. Bij de eerste 10 brabbels zal je een melding
+                         krijgen wanneer je beoordeling fout is. Je mag verder
+                         gaan naar de volgende brabbel wanneer je antwoord
+                         correct is. Bij de laatste 10 brabbels krijg je geen
+                         feedback meer.
                          """
                   ]
           ]

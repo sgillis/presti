@@ -66,15 +66,15 @@ instructions1 = row
                    """
             ]
     , p [ ] [ text """
-                   Je taak bestaat erin aan te geven
-                   waar de nadruk ligt en hoe sterk deze nadruk is. Dit doe je
-                   door het balkje naar links of naar rechts te schuiven.
-                   Wanneer je naar links schuift, wordt het linkerbolletje
-                   groter en het rechterbolletje kleiner. Wanneer je naar
-                   rechts schuift, gebeurt het omgekeerde. De grootte van de
-                   bolletjes is een visuele weergave van de nadruk die je hoort
-                   op elk deel: hoe groter hoe meer nadruk.  Probeer maar eens
-                   uit:
+                   Je taak bestaat erin aan te geven hoe de twee delen zich
+                   verhouden tegenover elkaar. Je moet aangeven waar de nadruk
+                   ligt en hoe sterk deze is.  Dit doe je door het balkje naar
+                   links of naar rechts te schuiven.  Wanneer je naar links
+                   schuift, wordt het linkerbolletje groter en het
+                   rechterbolletje kleiner. Wanneer je naar rechts schuift,
+                   gebeurt het omgekeerde. De grootte van de bolletjes is een
+                   visuele weergave van de nadruk die je hoort op elk deel: hoe
+                   groter hoe meer nadruk.  Probeer maar eens uit:
                    """
             ]
     ]
@@ -105,12 +105,13 @@ instructions3 = row
             ]
     , p [ ] [ text """
                    Na deze 6 voorbeelden kan je zelf even oefenen op 20
-                   brabbels waarin de nadruk duidelijk te horen is. Bij de
-                   eerste 10 brabbels zal je de boodschap “probeer opnieuw”
-                   krijgen, als je het balkje aan de foute kant van de as
-                   geplaatst hebt. Dit wil namelijk zeggen dat je de nadruk
-                   niet correct gelokaliseerd hebt. Als je balkje aan de
-                   juiste kant staat kan je naar de volgende brabbel gaan.
+                   brabbels waarin de nadruk duidelijk te horen is.  Bij de
+                   eerste 10 brabbels zal je de boodschap “Dit is niet helemaal
+                   juist. Luister nog eens goed?” krijgen, wanneer je het
+                   balkje aan de foute kant van de as geplaatst hebt.  Dit wil
+                   namelijk zeggen dat je de nadruk niet correct gelokaliseerd
+                   hebt. Als je balkje aan de juiste kant staat kan je naar de
+                   volgende brabbel gaan.
                    """
             ]
     , p [ ] [ text """
@@ -128,13 +129,12 @@ instructions3 = row
     , p [ ] [ b [ ] [ text "Belangrijk!" ]
             , text """
                    In de oefenfase zal de nadruk duidelijk op het eerste of het
-                   tweede deel vallen. Of de nadruk zal gelijk zijn op beide
-                   delen. Deze training dient om je te laten wennen aan het
-                   feit dat twee delen anders kunnen klinken. In de brabbels
-                   die je zal horen in het echte experiment is de nadruk vaak
-                   minder duidelijk hoorbaar dan in de oefensessie. In
-                   tegenstelling tot de oefenfase, is er dan geen juist of fout
-                   antwoord. Tijdens het experiment ga je gewoon af op je
+                   tweede deel vallen.  Deze training dient om je te laten
+                   wennen aan het feit dat twee delen anders kunnen klinken. In
+                   de brabbels die je zal horen in het echte experiment is de
+                   nadruk vaak minder duidelijk hoorbaar dan in de oefensessie.
+                   In tegenstelling tot de oefenfase, is er dan geen juist of
+                   fout antwoord. Tijdens het experiment ga je gewoon af op je
                    intuïtie. Wat jij hoort is voor ons belangrijk.
                    """
             ]
@@ -169,9 +169,9 @@ instructions3 = row
                      , li [ ]
                           [ text """
                                  Als je geslaagd bent in de oefening mag je
-                                 starten met het echte experiment. Hier is er
-                                 geen juist of fout antwoord en ga je gewoon af
-                                 op je gehoor.
+                                 starten met het echte experiment. Tijdens het
+                                 echte experiment is er geen juist of fout
+                                 antwoord en ga je gewoon af op je gehoor.
                                  """
                           ]
                      ]
