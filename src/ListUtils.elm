@@ -38,8 +38,15 @@ fisherYatesStep seed xs =
     let generator = Random.int 0 (List.length xs - 1)
         (randomN, newSeed) = Random.generate generator seed
         chosen = xs !! randomN
-        xs' = List.filter (\x -> x /= chosen) xs
+        xs' = drop randomN xs
     in (chosen, xs', newSeed)
+
+drop : Int -> List a -> List a
+drop x xs = case xs of
+    [] -> []
+    (x' :: xs') -> case x of
+                        0 -> xs'
+                        _ -> x' :: (drop (x-1) xs')
 
 zip : List a -> List b -> List (a, b)
 zip xs ys =

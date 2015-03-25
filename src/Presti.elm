@@ -18,6 +18,7 @@ import Example
 import Practice
 import Experiment
 
+
 -- MODEL
 
 type Action = NoOp
@@ -63,7 +64,7 @@ initialModel =
     , questions = Questionnaire.emptyQuestions
     , instructions = Instructions.emptyInstructions
     , example = Example.emptyExperiment
-    , practice = Practice.emptyExperiment
+    , practice = Practice.emptyExperiment 0
     , experiment = Experiment.emptyExperiment 0
     , submit = False
     , submitE = False
@@ -110,7 +111,8 @@ update action model = case action of
     Time x -> if model.startDate == 0
               then { model | startDate <- x
                            , now <- x
-                           , experiment <- Experiment.emptyExperiment (round x) }
+                           , experiment <- Experiment.emptyExperiment (round x)
+                           , practice <- Practice.emptyExperiment (round x) }
               else { model | now <- x }
     _ -> model
 
