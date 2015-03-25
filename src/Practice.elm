@@ -18,6 +18,7 @@ import ListUtils ((!), set, randomize, (!!), zip)
 
 type alias Experiment =
     { samples : List Int
+    , correct : List (Int, Int)
     , rates : List Int
     , repeats : List Int
     , sound : Sound.Model
@@ -29,14 +30,15 @@ type alias Experiment =
     , explanation : Bool
     }
 
-emptyExperiment : Experiment
-emptyExperiment =
-    { samples = [0..19]
+emptyExperiment : Int -> Experiment
+emptyExperiment x =
+    { samples = randomize x [0..19]
+    , correct = randomize x correctAnswers
     , rates = repeat 20 50
     , repeats = repeat 20 0
     , sound = { soundId = 0, playSound = True }
     , i = 0
-    , firstPhase = 5
+    , firstPhase = 10
     , error = False
     , endEarly = False
     , done = False
@@ -56,7 +58,7 @@ firstPhase exp =
 endEarly : Experiment -> Bool
 endEarly exp =
     let answers = drop exp.firstPhase exp.rates
-        correct = drop exp.firstPhase correctAnswers
+        correct = drop exp.firstPhase exp.correct
         list = zip answers correct
         f = \(x, (lower, upper)) -> (lower <= x) && (x <= upper)
         trues = filter f list
@@ -96,7 +98,7 @@ correctAnswers =
 
 isCorrect : Experiment -> Bool
 isCorrect exp =
-    let correctAnswer = correctAnswers !! exp.i
+    let correctAnswer = exp.correct !! exp.i
         lowerBound = fst correctAnswer
         upperBound = snd correctAnswer
     in (lowerBound <= (exp.rates !! exp.i)) &&
