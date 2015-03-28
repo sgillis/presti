@@ -12,7 +12,7 @@ audioHtml fileNames =
 
 nameToAudio : (Int, String) -> Html
 nameToAudio (audioId, srcName) = audio [ id <| toString audioId ]
-    [ source [ src ("https://s3-eu-west-1.amazonaws.com/presti-audio/" ++ srcName)
+    [ source [ src ("http://dj8x0e3hsg8v9.cloudfront.net/" ++ srcName)
              , type' "audio/wav"
              ] [ ]
     ]
