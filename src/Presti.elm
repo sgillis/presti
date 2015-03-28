@@ -275,7 +275,7 @@ port playSound = playSoundSignal
 port donePlaying : Signal Bool
 
 port refreshFoundation : Signal Float
-port refreshFoundation = every second
+port refreshFoundation = every (50 * millisecond)
 
 port sliderValue : Signal Int
 
