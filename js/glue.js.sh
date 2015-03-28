@@ -168,12 +168,23 @@ function slider_value(){
 presti.ports.refreshFoundation.subscribe(refresh_foundation);
 
 // Submit slider changes to Elm
+// Since the on_change triggers continuously, we only want to send when there
+// actually is a change. Failing to do so leads to subtle race condition
+var foundationSender = (function(){
+    var previousValue = 200;
+    var updater = function(){
+        var currentValue = parseInt(\$('#slider').attr('data-slider'));
+        if(currentValue != previousValue){
+            presti.ports.sliderValue.send(currentValue);
+            previousValue = currentValue;
+        }
+    }
+    return updater;
+})();
+
 \$(document).foundation({
     slider: {
-        on_change: function(){
-            presti.ports.sliderValue.send(
-                parseInt(\$('#slider').attr('data-slider')));
-        }
+        on_change: foundationSender
     }
 });
 
@@ -270,7 +281,6 @@ var model = (function(){
             storedState = localStorage.getItem(
                 'presti-'+elmModel.subject.number);
         } else if(elmModel.password == '' && justSaved == false) {
-            console.log('Saving');
             localStorage.setItem('presti-'+elmModel.subject.number,
                 JSON.stringify(elmModel));
             justSaved = true;
@@ -278,7 +288,6 @@ var model = (function(){
         }
 
         if (elmModel.screen != 'SubjectScreen' && storedState != null) {
-            console.log('Loading');
             m = JSON.parse(storedState)
             presti.ports.setModel.send(m);
             storedState = null;

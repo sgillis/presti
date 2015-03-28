@@ -32,18 +32,19 @@ type alias Experiment =
 
 emptyExperiment : Int -> Experiment
 emptyExperiment x =
-    { samples = randomize x [0..19]
-    , correct = randomize x correctAnswers
-    , rates = repeat 20 50
-    , repeats = repeat 20 0
-    , sound = { soundId = 0, playSound = True }
-    , i = 0
-    , firstPhase = 10
-    , error = False
-    , endEarly = False
-    , done = False
-    , explanation = True
-    }
+    let samples = randomize x [0..19]
+    in { samples = samples
+       , correct = randomize x correctAnswers
+       , rates = repeat 20 50
+       , repeats = repeat 20 0
+       , sound = { soundId = samples !! 0, playSound = True }
+       , i = 0
+       , firstPhase = 10
+       , error = False
+       , endEarly = False
+       , done = False
+       , explanation = True
+       }
 
 lastFragment : Experiment -> Bool
 lastFragment exp = exp.i == (length exp.samples - 1)
