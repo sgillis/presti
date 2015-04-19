@@ -57,7 +57,7 @@ instructions1 = row
     , p [ ] [ text """
 
                    Deze
-                   brabbels bestaan uit twee delen (bv. ba ba). Deze delen
+                   brabbels bestaan uit twee delen (bv. ti ti). Deze delen
                    kunnen in bepaalde gradaties benadrukt worden.
                    Bijvoorbeeld: er kan veel, weinig of matig nadruk kan op het
                    eerste deel liggen. Hetzelfde kan het geval zijn voor het
@@ -67,14 +67,14 @@ instructions1 = row
             ]
     , p [ ] [ text """
                    Je taak bestaat erin aan te geven hoe de twee delen zich
-                   verhouden tegenover elkaar. Je moet aangeven waar de nadruk
-                   ligt en hoe sterk deze is.  Dit doe je door het balkje naar
+                   verhouden tegenover elkaar. Dit doe je door het balkje naar
                    links of naar rechts te schuiven.  Wanneer je naar links
                    schuift, wordt het linkerbolletje groter en het
                    rechterbolletje kleiner. Wanneer je naar rechts schuift,
                    gebeurt het omgekeerde. De grootte van de bolletjes is een
-                   visuele weergave van de nadruk die je hoort op elk deel: hoe
-                   groter hoe meer nadruk.  Probeer maar eens uit:
+                   visuele weergave van de verhouding tussen de twee delen: hoe
+                   groter één van de twee bollen, hoe groter het verschil in
+                   nadruk tussen de twee delen.  Probeer maar eens uit:
                    """
             ]
     ]
@@ -99,8 +99,6 @@ instructions3 = row
                    Voor we aan de slag gaan, laten we je eerst 6 voorbeelden
                    zien en horen. Je zal telkens een brabbel horen en je zal
                    zien hoe het balkje in de juiste positie geschoven wordt.
-                   Jij zal op dezelfde manier tewerk moeten gaan in het
-                   experiment.
                    """
             ]
     , p [ ] [ text """
@@ -110,7 +108,7 @@ instructions3 = row
                    juist. Luister nog eens goed?” krijgen, wanneer je het
                    balkje aan de foute kant van de as geplaatst hebt.  Dit wil
                    namelijk zeggen dat je de nadruk niet correct gelokaliseerd
-                   hebt. Als je balkje aan de juiste kant staat kan je naar de
+                   hebt. Als het balkje aan de juiste kant staat kan je naar de
                    volgende brabbel gaan.
                    """
             ]
@@ -171,7 +169,12 @@ instructions3 = row
                                  Als je geslaagd bent in de oefening mag je
                                  starten met het echte experiment. Tijdens het
                                  echte experiment is er geen juist of fout
-                                 antwoord en ga je gewoon af op je gehoor.
+                                 antwoord en ga je gewoon af op je gehoor. De
+                                 balk bovenaan het scherm geeft aan hoe ver je
+                                 al gevorderd bent in het experiment. Er staat
+                                 geen tijdslimiet op het experiment. Je kan dus
+                                 zelf kiezen of je eventjes een pauze wilt
+                                 nemen.
                                  """
                           ]
                      ]
