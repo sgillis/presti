@@ -1,11 +1,11 @@
 module Subject where
 
-import Html (..)
-import Html.Attributes (..)
-import Html.Events (..)
-import Signal (..)
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
+import Signal exposing (..)
 
-import HtmlConstructs (..)
+import HtmlConstructs exposing (..)
 import Screens
 
 -- MODELS
@@ -43,7 +43,7 @@ subjectField val = row
     [ column 3 [ text "Subject ID" ]
     , column 9 [ input [ value val
                        , type' "text"
-                       , on "input" targetValue (send updateChannel << Number)
+                       , on "input" targetValue (message updateChannel.address << Number)
                        , style [("width", "200px")]
                        ] [ ]
                ]
@@ -52,5 +52,7 @@ subjectField val = row
 
 -- CHANNELS
 
-updateChannel : Channel Update
-updateChannel = channel NoOp
+updateChannel : Mailbox Update
+updateChannel = mailbox NoOp
+
+updateSignal = updateChannel.signal

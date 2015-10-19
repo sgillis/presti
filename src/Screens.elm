@@ -1,8 +1,8 @@
 module Screens where
 
-import Html (..)
-import Html.Events (..)
-import Signal (..)
+import Html exposing (..)
+import Html.Events exposing (..)
+import Signal exposing (..)
 
 
 -- MODELS
@@ -75,17 +75,22 @@ nextScreen model = case toScreen model of
     _                  -> fromScreen QuestionScreen
 
 
+
+
 -- VIEW
 nextScreenButton : Html
-nextScreenButton = button [ onClick (send screenChannel NextScreen) ]
+nextScreenButton = button [ onClick screenChannel.address NextScreen ]
                           [ text "Volgende scherm" ]
 
 previousScreenButton : Html
-previousScreenButton = button [ onClick (send screenChannel PreviousScreen) ]
+previousScreenButton = button [ onClick screenChannel.address PreviousScreen ]
                               [ text "Vorige scherm" ]
 
 
 -- CHANNELS
 
-screenChannel : Channel Update
-screenChannel = channel NextScreen
+screenChannel : Mailbox Update
+screenChannel = mailbox NextScreen
+
+screenAddress = screenChannel.address
+screenSignal = screenChannel.signal

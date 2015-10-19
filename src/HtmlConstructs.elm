@@ -1,7 +1,7 @@
 module HtmlConstructs where
 
-import Html (..)
-import Html.Attributes (..)
+import Html exposing (..)
+import Html.Attributes exposing (..)
 
 row : List Html -> Html
 row = div [ class "row" ]

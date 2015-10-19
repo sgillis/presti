@@ -1,13 +1,13 @@
 module Presti where
 
-import Html (..)
-import Html.Events (..)
-import Html.Attributes (..)
-import Signal (..)
-import Time (..)
+import Html exposing (..)
+import Html.Events exposing (..)
+import Html.Attributes exposing (..)
+import Signal exposing (..)
+import Time exposing (..)
 
-import HtmlConstructs (..)
-import Files (..)
+import HtmlConstructs exposing (..)
+import Files exposing (..)
 import Screens
 import Sound
 import Slider
@@ -186,7 +186,7 @@ submitView model = div [ class "container" ]
           ]
     , usernameField model.username
     , passwordField model.password
-    , row [ button [ onClick (send actionChannel Submit) ]
+    , row [ button [ onClick actionChannel.address Submit ]
                    [ text "Submit data" ] ]
     , if model.submitted
       then submissionComplete model
@@ -209,7 +209,7 @@ usernameField val = row
     [ column 3 [ text "Username" ]
     , column 9 [ input [ value val
                        , type' "text"
-                       , on "input" targetValue (send actionChannel << Username)
+                       , on "input" targetValue (message actionChannel.address << Username)
                        , style [("width", "200px")]
                        ] [ ]
                ]
@@ -220,7 +220,7 @@ passwordField val = row
     [ column 3 [ text "Password" ]
     , column 9 [ input [ value val
                        , type' "password"
-                       , on "input" targetValue (send actionChannel << Password)
+                       , on "input" targetValue (message actionChannel.address << Password)
                        , style [("width", "200px")]
                        ] [ ]
                ]
@@ -236,15 +236,15 @@ model = foldp update initialModel inputSignal
 
 inputSignal : Signal Action
 inputSignal =
-    merge (subscribe actionChannel)
- <| merge (ScreenUpdate <~ subscribe Screens.screenChannel)
- <| merge (SubjectUpdate <~ subscribe Subject.updateChannel)
- <| merge (QuestionnaireUpdate <~ subscribe Questionnaire.updateChannel)
+    merge actionChannel.signal
+ <| merge (ScreenUpdate <~ Screens.screenSignal)
+ <| merge (SubjectUpdate <~ Subject.updateSignal)
+ <| merge (QuestionnaireUpdate <~ Questionnaire.updateSignal)
  <| merge (SliderUpdate <~ (Slider.DragSlider <~ sliderValue))
  <| merge (SoundUpdate <~ (Sound.SoundPlayed <~ donePlaying))
- <| merge (ExampleUpdate <~ subscribe Example.exampleChannel)
- <| merge (PracticeUpdate <~ subscribe Practice.practiceChannel)
- <| merge (ExperimentUpdate <~ subscribe Experiment.experimentChannel)
+ <| merge (ExampleUpdate <~ Example.exampleSignal)
+ <| merge (PracticeUpdate <~ Practice.practiceSignal)
+ <| merge (ExperimentUpdate <~ Experiment.experimentSignal)
  <| merge (ModelSent <~ modelSent)
  <| merge (SubmitError <~ submitError)
  <| merge (SetModel <~ setModel)
@@ -255,13 +255,13 @@ soundIdSignal = .soundId <~ (getSound <~ model)
 
 playSoundSignal : Signal Bool
 playSoundSignal = merge (.playSound <~ (getSound <~ model))
-                        (subscribe Sound.soundChannel)
+                        Sound.soundSignal
 
 
 -- CHANNELS
 
-actionChannel : Channel Action
-actionChannel = channel NoOp
+actionChannel : Mailbox Action
+actionChannel = mailbox NoOp
 
 
 -- PORTS

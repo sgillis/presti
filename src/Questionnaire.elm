@@ -1,14 +1,14 @@
 module Questionnaire where
 
-import Html (..)
+import Html exposing (..)
 import Html
-import Html.Attributes (..)
-import Html.Events (..)
-import Signal (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
+import Signal exposing (..)
 import List
-import String (toInt)
+import String exposing (toInt)
 
-import HtmlConstructs (..)
+import HtmlConstructs exposing (..)
 import Screens
 
 
@@ -210,7 +210,7 @@ view q = div [ class "container" ]
     , pageBreak
     , if validateModel q
       then row [ Screens.nextScreenButton ]
-      else row [ button [ onClick (send updateChannel TrySend) ]
+      else row [ button [ onClick updateChannel.address TrySend ]
                         [ text "Volgende scherm" ]
                ]
     ]
@@ -282,7 +282,7 @@ inputField error desc val toUpdate = row
     , column 6 [ input
                   [ value val
                   , type' "text"
-                  , on "input" targetValue (send updateChannel << toUpdate)
+                  , on "input" targetValue (message updateChannel.address << toUpdate)
                   , style [ ("width", "100px") ]
                   ] [ ]
                 ]
@@ -293,7 +293,7 @@ commentsField val toUpdate = row
     [ column 6 [ text "Opmerkingen" ]
     , column 6 [ textarea
                  [ value val
-                 , on "input" targetValue (send updateChannel << toUpdate)
+                 , on "input" targetValue (message updateChannel.address << toUpdate)
                  ] [ ]
                ] ]
 
@@ -307,7 +307,7 @@ selectionField options error desc n val toUpdate = row
 createInput : String -> (String -> Update) -> String -> (String, String) -> Html
 createInput n toUpdate curVal (val, desc) = div [ class "input" ]
     [ input [ type' "radio", name n, value val
-            , on "change" targetValue (send updateChannel << toUpdate)
+            , on "change" targetValue (message updateChannel.address << toUpdate)
             , checked (val==curVal) ]
             [ ]
     , text desc
@@ -321,5 +321,7 @@ getValidationErrorColor b =
 
 
 -- CHANNELS
-updateChannel : Channel Update
-updateChannel = channel NoOp
+updateChannel : Mailbox Update
+updateChannel = mailbox NoOp
+
+updateSignal = updateChannel.signal

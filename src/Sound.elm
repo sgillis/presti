@@ -1,8 +1,8 @@
 module Sound where
 
-import Html (..)
-import Html.Events (..)
-import Signal (..)
+import Html exposing (..)
+import Html.Events exposing (..)
+import Signal exposing (..)
 
 
 -- MODELS
@@ -43,13 +43,12 @@ setSound x model = { model | soundId <- x }
 -- VIEW
 
 replayButton : Html
-replayButton = button [ onClick sendPlay ] [ text "Herbeluister" ]
+replayButton = button [ onClick soundChannel.address True ] [ text "Herbeluister" ]
 
 
 -- CHANNELS
 
-soundChannel : Channel Bool
-soundChannel = channel True
+soundChannel : Mailbox Bool
+soundChannel = mailbox True
 
-sendPlay : Message
-sendPlay = send soundChannel True
+soundSignal = soundChannel.signal

@@ -1,12 +1,12 @@
 module Instructions where
 
-import Html (..)
-import Html.Attributes (..)
-import Html.Events (..)
-import Signal (..)
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
+import Signal exposing (..)
 
-import HtmlConstructs (..)
-import Files (..)
+import HtmlConstructs exposing (..)
+import Files exposing (..)
 import Screens
 import Sound
 import Slider
@@ -42,7 +42,7 @@ view model = div [ class "container" ]
     , instructions2
     , pageBreak
     , instructions3
-    , row [ button [ onClick (send Screens.screenChannel Screens.NextScreen) ]
+    , row [ button [ onClick Screens.screenAddress Screens.NextScreen ]
                    [ text "Start" ]
           ]
     ]

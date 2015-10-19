@@ -1,17 +1,17 @@
 module Example where
 
-import Html (..)
-import Html.Attributes (..)
-import Html.Events (..)
-import Signal (..)
-import List (..)
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
+import Signal exposing (..)
+import List exposing (..)
 
-import HtmlConstructs (..)
-import Files (..)
+import HtmlConstructs exposing (..)
+import Files exposing (..)
 import Sound
 import Slider
 import Screens
-import ListUtils ((!), set, randomize, (!!))
+import ListUtils exposing ((!), set, randomize, (!!))
 
 -- MODELS
 
@@ -91,14 +91,14 @@ getSlider exp = case (exp.rates ! exp.i) of
     Just x  -> Slider.slider x
 
 nextButton : Html
-nextButton = button [ onClick (send exampleChannel Next) ]
+nextButton = button [ onClick exampleChannel.address Next ]
                     [ text "Volgend fragment" ]
 
 replayButton : Experiment -> Html
 replayButton exp =
     if exp.repeats !! exp.i >= 2
     then div [ ] [ ]
-    else button [ onClick (send exampleChannel Replay) ] [ text "Herbeluister" ]
+    else button [ onClick exampleChannel.address Replay ] [ text "Herbeluister" ]
 
 buttons : Experiment -> Html
 buttons exp =
@@ -108,5 +108,7 @@ buttons exp =
 
 
 -- CHANNELS
-exampleChannel : Channel Update
-exampleChannel = channel NoOp
+exampleChannel : Mailbox Update
+exampleChannel = mailbox NoOp
+
+exampleSignal = exampleChannel.signal

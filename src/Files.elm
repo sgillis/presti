@@ -1,7 +1,7 @@
 module Files where
 
-import Html (..)
-import Html.Attributes (..)
+import Html exposing (..)
+import Html.Attributes exposing (..)
 import List
 
 

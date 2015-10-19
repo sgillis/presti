@@ -1,18 +1,18 @@
 module Practice where
 
-import Html (..)
-import Html.Attributes (..)
-import Html.Events (..)
-import Signal (..)
-import List (..)
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
+import Signal exposing (..)
+import List exposing (..)
 
-import HtmlConstructs (..)
-import Files (..)
+import HtmlConstructs exposing (..)
+import Files exposing (..)
 import Sound
 import Slider
 import Screens
 import List
-import ListUtils ((!), set, randomize, (!!), zip)
+import ListUtils exposing ((!), set, randomize, (!!), zip)
 
 -- MODELS
 
@@ -62,7 +62,7 @@ endEarly exp =
         correct = drop exp.firstPhase exp.correct
         list = zip answers correct
         f = \(x, (lower, upper)) -> (lower <= x) && (x <= upper)
-        trues = filter f list
+        trues = List.filter f list
     in (List.length trues) <= ((List.length exp.rates - exp.firstPhase) // 2)
 
 type Update = NoOp
@@ -155,7 +155,7 @@ explanation = div [ class "container" ]
                          """
                   ]
           ]
-    , row [ button [ onClick (send practiceChannel ExplanationDone) ]
+    , row [ button [ onClick practiceChannel.address ExplanationDone ]
                    [ text "Start" ]
           ]
     ]
@@ -184,7 +184,7 @@ startExperiment = div [ class "container" ]
                          """
                   ]
           ]
-    , row [ button [ onClick (send Screens.screenChannel Screens.NextScreen) ]
+    , row [ button [ onClick Screens.screenAddress Screens.NextScreen ]
                    [ text "Start" ]
           ]
     ]
@@ -207,17 +207,17 @@ getSlider exp = case (exp.rates ! exp.i) of
     Just x  -> Slider.slider x
 
 nextButton : Html
-nextButton = button [ onClick (send practiceChannel Next) ]
+nextButton = button [ onClick practiceChannel.address Next ]
                     [ text "Volgend fragment" ]
 
 replayButton : Experiment -> Html
 replayButton exp =
     if exp.repeats !! exp.i >= 2
     then div [ ] [ ]
-    else button [ onClick (send practiceChannel Replay) ] [ text "Herbeluister" ]
+    else button [ onClick practiceChannel.address Replay ] [ text "Herbeluister" ]
 
 endButton : Html
-endButton = button [ onClick (send practiceChannel End) ] [ text "Volgende scherm" ]
+endButton = button [ onClick practiceChannel.address End ] [ text "Volgende scherm" ]
 
 buttons : Experiment -> Html
 buttons exp =
@@ -227,5 +227,7 @@ buttons exp =
 
 
 -- CHANNELS
-practiceChannel : Channel Update
-practiceChannel = channel NoOp
+practiceChannel : Mailbox Update
+practiceChannel = mailbox NoOp
+
+practiceSignal = practiceChannel.signal

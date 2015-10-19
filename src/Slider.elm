@@ -1,13 +1,13 @@
 module Slider where
 
-import Html (..)
-import Html.Attributes (..)
-import Html.Events (..)
-import Color (..)
-import Graphics.Element (..)
-import Graphics.Collage (..)
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
+import Color exposing (..)
+import Graphics.Element exposing (..)
+import Graphics.Collage exposing (..)
 
-import HtmlConstructs (..)
+import HtmlConstructs exposing (..)
 import Sound
 
 
@@ -47,9 +47,9 @@ slider size =
                       ]
                 ]
           ]
-    , row [ column 3 [ p [ ] [ text "Deel 1 heel sterk benadrukt" ] ]
+    , row [ column 3 [ p [ ] [ Html.text "Deel 1 heel sterk benadrukt" ] ]
           , column 3 [ p [ style [("text-align", "right")] ]
-                         [ text "Deel 2 heel sterk benadrukt" ] ]
+                         [ Html.text "Deel 2 heel sterk benadrukt" ] ]
           ]
     , pageBreak
     ]
