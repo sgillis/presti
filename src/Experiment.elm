@@ -25,10 +25,10 @@ type alias Experiment =
 
 emptyExperiment : Int -> Experiment
 emptyExperiment x =
-    let samples = randomize x [0..526]
+    let samples = randomize x [0..1]
     in { samples = samples
-       , rates = repeat 527 50
-       , repeats = repeat 527 0
+       , rates = repeat 2 50
+       , repeats = repeat 2 0
        , sound = { soundId = samples !! 0, playSound = True }
        , i = 0
        }
@@ -65,14 +65,18 @@ updateSound exp = case (exp.samples ! exp.i) of
 
 -- VIEW
 
-view : Experiment -> Html
-view exp = div [ class "container" ]
-    [ audioHtml experimentAudio
-    , prestiTitle
-    , progressBar exp.i (length exp.samples - 1)
-    , getSlider exp
-    , buttons exp
-    ]
+view : String -> Experiment -> Html
+view list exp =
+    let audioFiles = case list of
+                          "1" -> experimentAudio1
+                          "2" -> experimentAudio2
+    in div [ class "container" ]
+           [ audioHtml audioFiles
+           , prestiTitle
+           , progressBar exp.i (length exp.samples - 1)
+           , getSlider exp
+           , buttons exp
+           ]
 
 progressBar : Int -> Int -> Html
 progressBar x total = row [ div [ class "progress round" ]

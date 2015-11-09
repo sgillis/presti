@@ -74,6 +74,28 @@ nextScreen model = case toScreen model of
     SubmitScreen       -> fromScreen SubmitScreen
     _                  -> fromScreen QuestionScreen
 
+-- previousScreen : Model -> Model
+-- previousScreen model = case toScreen model of
+--     SubjectScreen      -> fromScreen ExperimentScreen
+--     QuestionScreen     -> fromScreen SubjectScreen
+--     InstructionsScreen -> fromScreen QuestionScreen
+--     ExampleScreen      -> fromScreen InstructionsScreen
+--     PracticeScreen     -> fromScreen ExampleScreen
+--     ExperimentScreen   -> fromScreen SubjectScreen
+--     SubmitScreen       -> fromScreen ExperimentScreen
+--     _                  -> fromScreen QuestionScreen
+
+-- nextScreen : Model -> Model
+-- nextScreen model = case toScreen model of
+--     SubjectScreen      -> fromScreen ExperimentScreen
+--     QuestionScreen     -> fromScreen InstructionsScreen
+--     InstructionsScreen -> fromScreen ExampleScreen
+--     ExampleScreen      -> fromScreen PracticeScreen
+--     PracticeScreen     -> fromScreen ExperimentScreen
+--     ExperimentScreen   -> fromScreen SubmitScreen
+--     SubmitScreen       -> fromScreen SubmitScreen
+--     _                  -> fromScreen QuestionScreen
+
 
 
 

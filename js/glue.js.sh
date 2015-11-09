@@ -20,7 +20,8 @@ presti = Elm.fullscreen(Elm.Presti, {
         'submitE': false,
         'submitted': false,
         'subject': {
-            'number': ''
+            'number': '',
+            'listNumber': '1'
         },
         'example': {
             'i': 0,
@@ -213,6 +214,7 @@ var model = (function(){
             'subject': {
                 'number': elmModel.subject.number,
                 'experimenter': elmModel.username,
+                'list_number': elmModel.subject.listNumber,
                 'start_date': new Date(elmModel.startDate*1000).toISOString(),
                 'end_date': new Date(elmModel.now*1000).toISOString()
             },
@@ -324,6 +326,16 @@ var practiceSamples =
     , 'wawa_trochee_I.wav'
     , 'baba_trochee_J.wav'
     , 'wawa_iamb_I.wav'
+    ]
+
+var experimentSamples1 =
+    [ 'wawa_trochee_J.wav'
+    , 'baba_trochee_K.wav'
+    ]
+
+var experimentSamples2 =
+    [ 'titi_iamb_J.wav'
+    , 'koko_trochee_K.wav'
     ]
 
 var experimentSamples =

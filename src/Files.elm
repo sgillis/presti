@@ -581,3 +581,15 @@ experimentAudio =
     , "998_PRELEX_BOB010405(01).wav"
     , "999_PRELEX_BOB010421(01).wav"
     ]
+
+experimentAudio1 : List String
+experimentAudio1 =
+    [ "wawa_trochee_J.wav"
+    , "baba_trochee_K.wav"
+    ]
+
+experimentAudio2 : List String
+experimentAudio2 =
+    [ "titi_iamb_J.wav"
+    , "koko_trochee_K.wav"
+    ]

@@ -7,16 +7,22 @@ import Signal exposing (..)
 
 import HtmlConstructs exposing (..)
 import Screens
+import String
 
 -- MODELS
 
-type alias Subject = { number : String }
+type alias Subject = { number : String
+                     , listNumber : String
+                     }
 
 type Update = NoOp
             | Number String
+            | ListNumber String
 
 emptySubject : Subject
-emptySubject = { number = "" }
+emptySubject = { number = ""
+               , listNumber = "1"
+               }
 
 
 -- UPDATE
@@ -25,6 +31,7 @@ update : Update -> Subject -> Subject
 update upd subj = case upd of
     NoOp -> subj
     Number x -> { subj | number <- x }
+    ListNumber x -> { subj | listNumber <- x }
 
 
 -- VIEW
@@ -33,6 +40,7 @@ view : Subject -> Html
 view sub = div [ class "container" ]
     [ prestiTitle
     , subjectField sub.number
+    , listNumberField
     , if sub.number /= ""
       then row [ Screens.nextScreenButton ]
       else div [ ] [ ]
@@ -46,6 +54,16 @@ subjectField val = row
                        , on "input" targetValue (message updateChannel.address << Number)
                        , style [("width", "200px")]
                        ] [ ]
+               ]
+    ]
+
+listNumberField : Html
+listNumberField = row
+    [ column 3 [ text "Lijst" ]
+    , column 9 [ select [ on "change" targetValue
+                             (message updateChannel.address << ListNumber) ]
+                        [ option [] [ text "1" ]
+                        , option [] [ text "2" ] ]
                ]
     ]
 

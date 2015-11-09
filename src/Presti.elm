@@ -172,7 +172,7 @@ view model = case Screens.toScreen model.screen of
     Screens.InstructionsScreen -> Instructions.view model.instructions
     Screens.ExampleScreen -> Example.view model.example
     Screens.PracticeScreen -> Practice.view model.practice
-    Screens.ExperimentScreen -> Experiment.view model.experiment
+    Screens.ExperimentScreen -> Experiment.view model.subject.listNumber model.experiment
     Screens.SubmitScreen -> submitView model
     _ -> row [ text "unknown screen" ]
 
