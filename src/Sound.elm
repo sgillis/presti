@@ -26,18 +26,18 @@ type Update = NoOp
 update : Update -> Model -> Model
 update u m = case u of
     NoOp              -> m
-    SoundPlayed True  -> { m | playSound <- False }
-    SoundPlayed False -> { m | playSound <- True }
+    SoundPlayed True  -> { m | playSound = False }
+    SoundPlayed False -> { m | playSound = True }
 
 playSound : Int -> Model -> Model
-playSound x model = { model | soundId <- x
-                            , playSound <- True }
+playSound x model = { model | soundId = x
+                            , playSound = True }
 
 repeatSound : Model -> Model
-repeatSound model = { model | playSound <- True }
+repeatSound model = { model | playSound = True }
 
 setSound : Int -> Model -> Model
-setSound x model = { model | soundId <- x }
+setSound x model = { model | soundId = x }
 
 
 -- VIEW

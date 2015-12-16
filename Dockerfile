@@ -9,8 +9,8 @@ ADD conf/nginx_presti.conf /etc/nginx/conf.d/presti.conf
 RUN mkdir -p /data/www/src
 ADD css /data/www/css
 ADD js /data/www/js
-ADD index.html /data/www/index.html
 ADD src/elm.js /data/www/src/elm.js
+ADD index.html /data/www/index.html
 
 EXPOSE 80
 

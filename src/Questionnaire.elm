@@ -97,20 +97,20 @@ setValidationErrors q =
                        Ok x -> True
                        Err x -> False
         newErrors =
-            { emptyValidationErrors | leeftijd <- not (isInt q.leeftijd)
-                                    , geslacht <- q.geslacht == ""
-                                    , vraag1 <- q.vraag1 == ""
-                                    , vraag2 <- q.vraag2 == ""
-                                    , vraag3 <- q.vraag3 == ""
-                                    , vraag4 <- q.vraag4 == ""
-                                    , vraag5 <- q.vraag5 == ""
-                                    , vraag6 <- q.vraag6 == ""
-                                    , vraag7 <- q.vraag7 == ""
-                                    , vraag8 <- q.vraag8 == ""
-                                    , vraag9 <- q.vraag9 == ""
-                                    , vraag10 <- q.vraag10 == ""
-                                    , vraag11 <- q.vraag11 == "" }
-    in { q | errors <- newErrors }
+            { emptyValidationErrors | leeftijd = not (isInt q.leeftijd)
+                                    , geslacht = q.geslacht == ""
+                                    , vraag1 = q.vraag1 == ""
+                                    , vraag2 = q.vraag2 == ""
+                                    , vraag3 = q.vraag3 == ""
+                                    , vraag4 = q.vraag4 == ""
+                                    , vraag5 = q.vraag5 == ""
+                                    , vraag6 = q.vraag6 == ""
+                                    , vraag7 = q.vraag7 == ""
+                                    , vraag8 = q.vraag8 == ""
+                                    , vraag9 = q.vraag9 == ""
+                                    , vraag10 = q.vraag10 == ""
+                                    , vraag11 = q.vraag11 == "" }
+    in { q | errors = newErrors }
 
 type alias ValidationErrors =
     { leeftijd : Bool
@@ -177,29 +177,29 @@ type Update = NoOp
 update : Update -> Questions -> Questions
 update u q = case u of
     NoOp            -> q
-    Leeftijd str    -> { q | leeftijd    <- str }
-    Geslacht str    -> { q | geslacht    <- str }
-    Vraag1 str      -> { q | vraag1      <- str }
-    Opmerking1 str  -> { q | opmerking1  <- str }
-    Vraag2 str      -> { q | vraag2      <- str }
-    Opmerking2 str  -> { q | opmerking2  <- str }
-    Vraag3 str      -> { q | vraag3      <- str }
-    Opmerking3 str  -> { q | opmerking3  <- str }
-    Vraag4 str      -> { q | vraag4      <- str }
-    Opmerking4 str  -> { q | opmerking4  <- str }
-    Vraag5 str      -> { q | vraag5      <- str }
-    Opmerking5 str  -> { q | opmerking5  <- str }
-    Vraag6 str      -> { q | vraag6      <- str }
-    Opmerking6 str  -> { q | opmerking6  <- str }
-    Vraag7 str      -> { q | vraag7      <- str }
-    Opmerking7 str  -> { q | opmerking7  <- str }
-    Vraag8 str      -> { q | vraag8      <- str }
-    Opmerking8 str  -> { q | opmerking8  <- str }
-    Vraag9 str      -> { q | vraag9      <- str }
-    Opmerking9 str  -> { q | opmerking9  <- str }
-    Vraag10 str     -> { q | vraag10     <- str }
-    Opmerking10 str -> { q | opmerking10 <- str }
-    Vraag11 str     -> { q | vraag11     <- str }
+    Leeftijd str    -> { q | leeftijd    = str }
+    Geslacht str    -> { q | geslacht    = str }
+    Vraag1 str      -> { q | vraag1      = str }
+    Opmerking1 str  -> { q | opmerking1  = str }
+    Vraag2 str      -> { q | vraag2      = str }
+    Opmerking2 str  -> { q | opmerking2  = str }
+    Vraag3 str      -> { q | vraag3      = str }
+    Opmerking3 str  -> { q | opmerking3  = str }
+    Vraag4 str      -> { q | vraag4      = str }
+    Opmerking4 str  -> { q | opmerking4  = str }
+    Vraag5 str      -> { q | vraag5      = str }
+    Opmerking5 str  -> { q | opmerking5  = str }
+    Vraag6 str      -> { q | vraag6      = str }
+    Opmerking6 str  -> { q | opmerking6  = str }
+    Vraag7 str      -> { q | vraag7      = str }
+    Opmerking7 str  -> { q | opmerking7  = str }
+    Vraag8 str      -> { q | vraag8      = str }
+    Opmerking8 str  -> { q | opmerking8  = str }
+    Vraag9 str      -> { q | vraag9      = str }
+    Opmerking9 str  -> { q | opmerking9  = str }
+    Vraag10 str     -> { q | vraag10     = str }
+    Opmerking10 str -> { q | opmerking10 = str }
+    Vraag11 str     -> { q | vraag11     = str }
     TrySend         -> setValidationErrors q
 
 

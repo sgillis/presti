@@ -61,7 +61,6 @@ previousScreen model = case toScreen model of
     PracticeScreen     -> fromScreen ExampleScreen
     ExperimentScreen   -> fromScreen PracticeScreen
     SubmitScreen       -> fromScreen ExperimentScreen
-    _                  -> fromScreen QuestionScreen
 
 nextScreen : Model -> Model
 nextScreen model = case toScreen model of
@@ -72,7 +71,6 @@ nextScreen model = case toScreen model of
     PracticeScreen     -> fromScreen ExperimentScreen
     ExperimentScreen   -> fromScreen SubmitScreen
     SubmitScreen       -> fromScreen SubmitScreen
-    _                  -> fromScreen QuestionScreen
 
 -- previousScreen : Model -> Model
 -- previousScreen model = case toScreen model of

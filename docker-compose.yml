@@ -1,7 +1,7 @@
 presti:
     build: .
     environment:
-        - BACKEND_URL=http://10.2.0.10:3000
+        - BACKEND_URL=http://192.168.99.100:3000
     volumes:
         - .:/data/www
     ports:

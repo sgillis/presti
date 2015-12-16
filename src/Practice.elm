@@ -37,7 +37,8 @@ emptyExperiment x =
        , correct = randomize x correctAnswers
        , rates = repeat 20 50
        , repeats = repeat 20 0
-       , sound = { soundId = samples !! 0, playSound = True }
+       , sound = { soundId = Maybe.withDefault 0 <| samples !! 0
+                 , playSound = True }
        , i = 0
        , firstPhase = 10
        , error = False
@@ -99,11 +100,11 @@ correctAnswers =
 
 isCorrect : Experiment -> Bool
 isCorrect exp =
-    let correctAnswer = exp.correct !! exp.i
+    let correctAnswer = Maybe.withDefault (0,100) <| exp.correct !! exp.i
         lowerBound = fst correctAnswer
         upperBound = snd correctAnswer
-    in (lowerBound <= (exp.rates !! exp.i)) &&
-       ((exp.rates !! exp.i)  <= upperBound)
+    in (lowerBound <= (Maybe.withDefault 0 <| exp.rates !! exp.i)) &&
+       ((Maybe.withDefault 0 <| exp.rates !! exp.i)  <= upperBound)
 
 
 -- UPDATE
@@ -111,24 +112,27 @@ isCorrect exp =
 update : Update -> Experiment -> Experiment
 update upd exp = case upd of
     NoOp -> exp
-    SliderUpdate x -> { exp | rates <- set exp.rates exp.i x }
+    SliderUpdate x -> { exp | rates = set exp.rates exp.i x }
     Next -> if firstPhase exp
             then if isCorrect exp
-                 then updateSound { exp | i <- exp.i + 1
-                                        , error <- False }
-                 else { exp | error <- True }
-            else updateSound { exp | i <- exp.i + 1 }
-    Previous -> updateSound { exp | i <- exp.i - 1 }
-    Replay -> { exp | sound <- Sound.repeatSound exp.sound
-                    , repeats <- set exp.repeats exp.i (exp.repeats !! exp.i + 1) }
-    End -> { exp | done <- True
-                 , endEarly <- endEarly exp }
-    ExplanationDone -> { exp | explanation <- False }
+                 then updateSound { exp | i = exp.i + 1
+                                        , error = False }
+                 else { exp | error = True }
+            else updateSound { exp | i = exp.i + 1 }
+    Previous -> updateSound { exp | i = exp.i - 1 }
+    Replay ->
+      { exp | sound = Sound.repeatSound exp.sound
+      , repeats = set exp.repeats exp.i
+                  ((Maybe.withDefault 0 <| exp.repeats !! exp.i) + 1)
+      }
+    End -> { exp | done = True
+                 , endEarly = endEarly exp }
+    ExplanationDone -> { exp | explanation = False }
 
 updateSound : Experiment -> Experiment
 updateSound exp = case (exp.samples ! exp.i) of
     Nothing -> exp
-    Just x  -> { exp | sound <- Sound.playSound x exp.sound }
+    Just x  -> { exp | sound = Sound.playSound x exp.sound }
 
 
 -- VIEW
@@ -212,7 +216,7 @@ nextButton = button [ onClick practiceChannel.address Next ]
 
 replayButton : Experiment -> Html
 replayButton exp =
-    if exp.repeats !! exp.i >= 2
+    if (Maybe.withDefault 0 <| exp.repeats !! exp.i) >= 2
     then div [ ] [ ]
     else button [ onClick practiceChannel.address Replay ] [ text "Herbeluister" ]
 

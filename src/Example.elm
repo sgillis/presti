@@ -60,16 +60,17 @@ explanationStrings =
 update : Update -> Experiment -> Experiment
 update upd exp = case upd of
     NoOp -> exp
-    SliderUpdate x -> { exp | rates <- set exp.rates exp.i x }
-    Next -> updateSound { exp | i <- exp.i + 1 }
-    Previous -> updateSound { exp | i <- exp.i - 1 }
-    Replay -> { exp | sound <- Sound.repeatSound exp.sound
-                    , repeats <- set exp.repeats exp.i (exp.repeats !! exp.i + 1) }
+    SliderUpdate x -> { exp | rates = set exp.rates exp.i x }
+    Next -> updateSound { exp | i = exp.i + 1 }
+    Previous -> updateSound { exp | i = exp.i - 1 }
+    Replay -> { exp | sound = Sound.repeatSound exp.sound
+                    , repeats = set exp.repeats exp.i
+                                ((Maybe.withDefault 0 <| exp.repeats !! exp.i) + 1) }
 
 updateSound : Experiment -> Experiment
 updateSound exp = case (exp.samples ! exp.i) of
     Nothing -> exp
-    Just x  -> { exp | sound <- Sound.playSound x exp.sound }
+    Just x  -> { exp | sound = Sound.playSound x exp.sound }
 
 
 -- VIEW
@@ -80,7 +81,7 @@ view exp = div [ class "container" ]
     , prestiTitle
     , row [ text <| "Voorbeeld " ++ toString (exp.i + 1) ++ "/" ++ toString (length exp.samples) ]
     , getSlider exp
-    , row [ text <| explanationStrings !! exp.i ]
+    , row [ text <| Maybe.withDefault "" <| explanationStrings !! exp.i ]
     , pageBreak
     , buttons exp
     ]
@@ -96,7 +97,7 @@ nextButton = button [ onClick exampleChannel.address Next ]
 
 replayButton : Experiment -> Html
 replayButton exp =
-    if exp.repeats !! exp.i >= 2
+    if (Maybe.withDefault 0 <| exp.repeats !! exp.i) >= 2
     then div [ ] [ ]
     else button [ onClick exampleChannel.address Replay ] [ text "Herbeluister" ]
 

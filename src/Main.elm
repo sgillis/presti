@@ -7,7 +7,6 @@ import Signal exposing (..)
 import Time exposing (..)
 
 import HtmlConstructs exposing (..)
-import Files exposing (..)
 import Screens
 import Sound
 import Slider
@@ -87,33 +86,33 @@ getSound model = case Screens.toScreen model.screen of
 update : Action -> Model -> Model
 update action model = case action of
     NoOp -> model
-    ScreenUpdate u -> { model | screen <- Screens.update u model.screen }
+    ScreenUpdate u -> { model | screen = Screens.update u model.screen }
     SubjectUpdate update ->
-        { model | subject <- Subject.update update model.subject }
+        { model | subject = Subject.update update model.subject }
     QuestionnaireUpdate update ->
-        { model | questions <- Questionnaire.update update model.questions }
+        { model | questions = Questionnaire.update update model.questions }
     ExampleUpdate update ->
-        { model | example <- Example.update update model.example }
+        { model | example = Example.update update model.example }
     PracticeUpdate update ->
-        { model | practice <- Practice.update update model.practice }
+        { model | practice = Practice.update update model.practice }
     ExperimentUpdate update ->
-        { model | experiment <- Experiment.update update model.experiment }
+        { model | experiment = Experiment.update update model.experiment }
     SliderUpdate update -> updateSlider update model
     SoundUpdate update -> updateSound update model
-    Submit -> { model | submit <- True }
-    ModelSent True -> { model | submit <- False
-                              , submitted <- True
-                              , password <- "" }
-    SubmitError x -> { model | submitE <- x }
-    Username x -> { model | username <- x }
-    Password x -> { model | password <- x }
+    Submit -> { model | submit = True }
+    ModelSent True -> { model | submit = False
+                              , submitted = True
+                              , password = "" }
+    SubmitError x -> { model | submitE = x }
+    Username x -> { model | username = x }
+    Password x -> { model | password = x }
     SetModel m -> m
     Time x -> if model.startDate == 0
-              then { model | startDate <- x
-                           , now <- x
-                           , experiment <- Experiment.emptyExperiment (round x)
-                           , practice <- Practice.emptyExperiment (round x) }
-              else { model | now <- x }
+              then { model | startDate = x
+                           , now = x
+                           , experiment = Experiment.emptyExperiment (round x)
+                           , practice = Practice.emptyExperiment (round x) }
+              else { model | now = x }
     _ -> model
 
 updateSound : Sound.Update -> Model -> Model
@@ -121,20 +120,20 @@ updateSound u model = case Screens.toScreen model.screen of
     Screens.QuestionScreen -> model
     Screens.InstructionsScreen ->
         let ins = model.instructions
-            newIns = { ins | sound <- Sound.update u ins.sound }
-        in { model | instructions <- newIns }
+            newIns = { ins | sound = Sound.update u ins.sound }
+        in { model | instructions = newIns }
     Screens.ExampleScreen ->
         let ex = model.example
-            newEx = { ex | sound <- Sound.update u ex.sound }
-        in { model | example <- newEx }
+            newEx = { ex | sound = Sound.update u ex.sound }
+        in { model | example = newEx }
     Screens.PracticeScreen ->
         let pr = model.practice
-            newPr = { pr | sound <- Sound.update u pr.sound }
-        in { model | practice <- newPr }
+            newPr = { pr | sound = Sound.update u pr.sound }
+        in { model | practice = newPr }
     Screens.ExperimentScreen ->
         let exp = model.experiment
-            newExp = { exp | sound <- Sound.update u exp.sound }
-        in { model | experiment <- newExp }
+            newExp = { exp | sound = Sound.update u exp.sound }
+        in { model | experiment = newExp }
     _ -> model
 
 updateSlider : Slider.Update -> Model -> Model
@@ -142,24 +141,26 @@ updateSlider u model = case Screens.toScreen model.screen of
     Screens.QuestionScreen -> model
     Screens.InstructionsScreen ->
         let ins = model.instructions
-            newIns = { ins | slider <- Slider.update u ins.slider }
-        in { model | instructions <- newIns }
+            newIns = { ins | slider = Slider.update u ins.slider }
+        in { model | instructions = newIns }
     Screens.ExampleScreen -> case u of
         Slider.DragSlider x ->
-            { model | example <- Example.update
+            { model | example = Example.update
                                  (Example.SliderUpdate x)
                                  model.example }
+        Slider.NoOp -> model
     Screens.PracticeScreen -> case u of
         Slider.DragSlider x ->
-            { model | practice <- Practice.update
+            { model | practice = Practice.update
                                   (Practice.SliderUpdate x)
                                   model.practice }
+        Slider.NoOp -> model
     Screens.ExperimentScreen -> case u of
         Slider.DragSlider x ->
-            { model | experiment <- Experiment.update
+            { model | experiment = Experiment.update
                                     (Experiment.SliderUpdate x)
                                     model.experiment }
-        _ -> model
+        Slider.NoOp -> model
     _ ->  model
 
 
@@ -174,7 +175,6 @@ view model = case Screens.toScreen model.screen of
     Screens.PracticeScreen -> Practice.view model.practice
     Screens.ExperimentScreen -> Experiment.view model.subject.listNumber model.experiment
     Screens.SubmitScreen -> submitView model
-    _ -> row [ text "unknown screen" ]
 
 submitView : Model -> Html
 submitView model = div [ class "container" ]
@@ -237,24 +237,24 @@ model = foldp update initialModel inputSignal
 inputSignal : Signal Action
 inputSignal =
     merge actionChannel.signal
- <| merge (ScreenUpdate <~ Screens.screenSignal)
- <| merge (SubjectUpdate <~ Subject.updateSignal)
- <| merge (QuestionnaireUpdate <~ Questionnaire.updateSignal)
- <| merge (SliderUpdate <~ (Slider.DragSlider <~ sliderValue))
- <| merge (SoundUpdate <~ (Sound.SoundPlayed <~ donePlaying))
- <| merge (ExampleUpdate <~ Example.exampleSignal)
- <| merge (PracticeUpdate <~ Practice.practiceSignal)
- <| merge (ExperimentUpdate <~ Experiment.experimentSignal)
- <| merge (ModelSent <~ modelSent)
- <| merge (SubmitError <~ submitError)
- <| merge (SetModel <~ setModel)
-          (Time <~ currentTime)
+ <| merge (Signal.map ScreenUpdate Screens.screenSignal)
+ <| merge (Signal.map SubjectUpdate Subject.updateSignal)
+ <| merge (Signal.map QuestionnaireUpdate Questionnaire.updateSignal)
+ <| merge (Signal.map SliderUpdate (Signal.map Slider.DragSlider sliderValue))
+ <| merge (Signal.map SoundUpdate (Signal.map Sound.SoundPlayed donePlaying))
+ <| merge (Signal.map ExampleUpdate Example.exampleSignal)
+ <| merge (Signal.map PracticeUpdate Practice.practiceSignal)
+ <| merge (Signal.map ExperimentUpdate Experiment.experimentSignal)
+ <| merge (Signal.map ModelSent modelSent)
+ <| merge (Signal.map SubmitError submitError)
+ <| merge (Signal.map SetModel setModel)
+          (Signal.map Time currentTime)
 
 soundIdSignal : Signal Int
-soundIdSignal = .soundId <~ (getSound <~ model)
+soundIdSignal = Signal.map .soundId (Signal.map getSound model)
 
 playSoundSignal : Signal Bool
-playSoundSignal = merge (.playSound <~ (getSound <~ model))
+playSoundSignal = merge (Signal.map .playSound (Signal.map getSound model))
                         Sound.soundSignal
 
 

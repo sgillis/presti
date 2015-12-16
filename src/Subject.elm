@@ -30,8 +30,8 @@ emptySubject = { number = ""
 update : Update -> Subject -> Subject
 update upd subj = case upd of
     NoOp -> subj
-    Number x -> { subj | number <- x }
-    ListNumber x -> { subj | listNumber <- x }
+    Number x -> { subj | number = x }
+    ListNumber x -> { subj | listNumber = x }
 
 
 -- VIEW
@@ -63,7 +63,9 @@ listNumberField = row
     , column 9 [ select [ on "change" targetValue
                              (message updateChannel.address << ListNumber) ]
                         [ option [] [ text "1" ]
-                        , option [] [ text "2" ] ]
+                        , option [] [ text "2" ]
+                        , option [] [ text "3" ]
+                        ]
                ]
     ]
 

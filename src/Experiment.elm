@@ -25,11 +25,12 @@ type alias Experiment =
 
 emptyExperiment : Int -> Experiment
 emptyExperiment x =
-    let samples = randomize x [0..1]
+    let samples = randomize x [0..362]
     in { samples = samples
-       , rates = repeat 2 50
-       , repeats = repeat 2 0
-       , sound = { soundId = samples !! 0, playSound = True }
+       , rates = repeat 363 50
+       , repeats = repeat 363 0
+       , sound = { soundId = Maybe.withDefault 0 <| samples !! 0
+                 , playSound = True }
        , i = 0
        }
 
@@ -51,16 +52,17 @@ type Update = NoOp
 update : Update -> Experiment -> Experiment
 update upd exp = case upd of
     NoOp -> exp
-    SliderUpdate x -> { exp | rates <- set exp.rates exp.i x }
-    Next -> updateSound { exp | i <- exp.i + 1 }
-    Previous -> updateSound { exp | i <- exp.i - 1 }
-    Replay -> { exp | sound <- Sound.repeatSound exp.sound
-                    , repeats <- set exp.repeats exp.i (exp.repeats !! exp.i + 1) }
+    SliderUpdate x -> { exp | rates = set exp.rates exp.i x }
+    Next -> updateSound { exp | i = exp.i + 1 }
+    Previous -> updateSound { exp | i = exp.i - 1 }
+    Replay -> { exp | sound = Sound.repeatSound exp.sound
+                    , repeats = set exp.repeats exp.i
+                                ((Maybe.withDefault 0 <| exp.repeats !! exp.i) + 1) }
 
 updateSound : Experiment -> Experiment
 updateSound exp = case (exp.samples ! exp.i) of
     Nothing -> exp
-    Just x  -> { exp | sound <- Sound.playSound x exp.sound }
+    Just x  -> { exp | sound = Sound.playSound x exp.sound }
 
 
 -- VIEW
@@ -70,6 +72,8 @@ view list exp =
     let audioFiles = case list of
                           "1" -> experimentAudio1
                           "2" -> experimentAudio2
+                          "3" -> experimentAudio3
+                          _ -> experimentAudio1
     in div [ class "container" ]
            [ audioHtml audioFiles
            , prestiTitle
@@ -96,7 +100,7 @@ nextButton = button [ onClick experimentChannel.address Next ]
 
 replayButton : Experiment -> Html
 replayButton exp =
-    if exp.repeats !! exp.i >= 2
+    if (Maybe.withDefault 0 <| exp.repeats !! exp.i) >= 2
     then div [ ] [ ]
     else button [ onClick experimentChannel.address Replay ] [ text "Herbeluister" ]
 

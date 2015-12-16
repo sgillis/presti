@@ -1,11 +1,13 @@
 module ListUtils where
 
 import Random
+import Random.Array exposing (shuffle)
+import Array
 import List
 
 
 (!) : List a -> Int -> Maybe a
-xs ! n = case xs of
+(!) xs n = case xs of
     [] -> Nothing
     (x :: xs) -> case n of
                       0 -> Just x
@@ -18,28 +20,20 @@ set xs n x = case xs of
                        0 -> x :: xs
                        _ -> x' :: (set xs (n-1) x)
 
-(!!) : List a -> Int -> a
-(!!) xs n = case xs of
+(!!) : List a -> Int -> Maybe a
+(!!) xs n =
+  case xs of
     (x :: xs) -> case n of
-                      0 -> x
+                      0 -> Just x
                       _ -> xs !! (n-1)
+    [] -> Nothing
 
 randomize : Int -> List a -> List a
-randomize x xs = randomize' (Random.initialSeed x) xs
-
-randomize' : Random.Seed -> List a -> List a
-randomize' seed xs = case xs of
-    [] -> []
-    xs -> let (chosen, xs', newSeed) = fisherYatesStep seed xs
-          in chosen :: randomize' newSeed xs'
-
-fisherYatesStep : Random.Seed -> List a -> (a, List a, Random.Seed)
-fisherYatesStep seed xs =
-    let generator = Random.int 0 (List.length xs - 1)
-        (randomN, newSeed) = Random.generate generator seed
-        chosen = xs !! randomN
-        xs' = drop randomN xs
-    in (chosen, xs', newSeed)
+randomize initSeed xs =
+  let gen = shuffle (Array.fromList xs)
+      seed = Random.initialSeed initSeed
+      (array, seed') = Random.generate gen seed
+  in Array.toList array
 
 drop : Int -> List a -> List a
 drop x xs = case xs of
